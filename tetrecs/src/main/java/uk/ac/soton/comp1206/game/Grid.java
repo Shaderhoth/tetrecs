@@ -2,6 +2,10 @@ package uk.ac.soton.comp1206.game;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.time.format.DateTimeFormatter;
 
 /**
  * The Grid is a model which holds the state of a game board. It is made up of a set of Integer values arranged in a 2D
@@ -16,6 +20,8 @@ import javafx.beans.property.SimpleIntegerProperty;
  */
 public class Grid {
 
+    private static final Logger logger = LogManager.getLogger(Grid.class);
+    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
     /**
      * The number of columns in this grid
      */
@@ -102,5 +108,32 @@ public class Grid {
     public int getRows() {
         return rows;
     }
+
+    public boolean canPlayPiece(GamePiece piece, int x,int y){
+        logger.info("Can play " + piece.getValue() + " at (" +x+","+y+")?");
+        int[][] blocks = piece.getBlocks();
+        for (int i = 0; i<3;i++) {
+            for (int j = 0; j<3;j++) {
+                if (blocks[i][j] != 0 && get((x + i - 1),(y+j-1)) != 0 ){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    public void playPiece(GamePiece piece, int x,int y){
+        logger.info("Playing " + piece.getValue() + " at (" +x+","+y+")");
+        int[][] blocks = piece.getBlocks();
+        if (canPlayPiece(piece,x,y)){
+            for (int i = 0; i<3;i++) {
+                for (int j = 0; j<3;j++) {
+                    if (blocks[i][j] != 0 ){
+                        set((x + i - 1),(y+j-1),blocks[i][j]);
+                    }
+                }
+            }
+        }
+    }
+
 
 }

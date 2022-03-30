@@ -1,6 +1,9 @@
 package uk.ac.soton.comp1206.ui;
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -32,6 +35,8 @@ public class GameWindow {
     private Scene scene;
 
     final Communicator communicator;
+
+
 
     /**
      * Create a new GameWindow attached to the given stage with the specified width and height
@@ -160,4 +165,5 @@ public class GameWindow {
     public Communicator getCommunicator() {
         return communicator;
     }
+
 }

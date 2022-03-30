@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.utilities.Multimedia;
 
 /**
  * The main menu of the game. Provides a gateway to the rest of the game.
@@ -15,7 +16,7 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 public class MenuScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
-
+    private Multimedia media;
     /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
@@ -33,7 +34,7 @@ public class MenuScene extends BaseScene {
         logger.info("Building " + this.getClass().getName());
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
-
+        media = new Multimedia("menu.mp3");
         var menuPane = new StackPane();
         menuPane.setMaxWidth(gameWindow.getWidth());
         menuPane.setMaxHeight(gameWindow.getHeight());
@@ -69,6 +70,7 @@ public class MenuScene extends BaseScene {
      * @param event event
      */
     private void startGame(ActionEvent event) {
+        media.stop();
         gameWindow.startChallenge();
     }
 

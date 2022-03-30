@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.beans.property.Property;
 import javafx.scene.layout.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,6 +9,7 @@ import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.utilities.Multimedia;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
@@ -15,6 +17,8 @@ import uk.ac.soton.comp1206.ui.GameWindow;
 public class ChallengeScene extends BaseScene {
 
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+
+    private SideBar sidePane;
     protected Game game;
 
     /**
@@ -34,7 +38,7 @@ public class ChallengeScene extends BaseScene {
         logger.info("Building " + this.getClass().getName());
 
         setupGame();
-
+        Multimedia media = new Multimedia("game.wav");
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
 
         var challengePane = new StackPane();
@@ -48,6 +52,14 @@ public class ChallengeScene extends BaseScene {
 
         var board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
         mainPane.setCenter(board);
+
+        sidePane = new SideBar();
+        mainPane.setRight(sidePane);
+        sidePane.getScoreField().textProperty().bind(game.scoreProperty().asString());
+        sidePane.getLevelField().textProperty().bind(game.livesProperty().asString());
+        sidePane.getLivesField().textProperty().bind(game.livesProperty().asString());
+        sidePane.getMultiplierField().textProperty().bind(game.multiplierProperty().asString());
+
 
         //Handle block on gameboard grid being clicked
         board.setOnBlockClick(this::blockClicked);
