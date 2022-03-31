@@ -1,10 +1,13 @@
 package uk.ac.soton.comp1206.component;
 
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.event.BlockClickedListener;
+import uk.ac.soton.comp1206.event.BlockHoveredListener;
+import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.game.Grid;
 
 /**
@@ -55,6 +58,11 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
+    private BlockHoveredListener blockHoveredListener;
+
+    private GamePiece nextPiece;
+    private int x = 1;
+    private int y = 1;
 
 
     /**
@@ -147,6 +155,7 @@ public class GameBoard extends GridPane {
 
         //Add a mouse click handler to the block to trigger GameBoard blockClicked method
         block.setOnMouseClicked((e) -> blockClicked(e, block));
+        block.setOnMouseMoved((e) -> blockHovered(e, block));
 
         return block;
     }
@@ -168,7 +177,59 @@ public class GameBoard extends GridPane {
         logger.info("Block clicked: {}", block);
 
         if(blockClickedListener != null) {
-            blockClickedListener.blockClicked(block);
+            blockClickedListener.blockClicked(event, block);
+
+        }
+    }
+    public void setOnBlockHover(BlockHoveredListener listener) {
+        this.blockHoveredListener = listener;
+    }
+
+    /**
+     * Triggered when a block is clicked. Call the attached listener.
+     * @param event mouse event
+     * @param block block clicked on
+     */
+    private void blockHovered(MouseEvent event, GameBlock block) {
+        if(blockHoveredListener != null) {
+            blockHoveredListener.blockHovered(event, block);
+
+        }
+    }
+    public void resetBoard(){
+        for(var y = 0; y < rows; y++) {
+            for (var x = 0; x < cols; x++) {
+                blocks[x][y].paint();
+            }
+        }
+
+    }
+    public void target(int x, int y){
+        this.x = x;
+        this.y = y;
+        blocks[x][y].drawCircle();
+        int[][] bs = nextPiece.getBlocks();
+        for (int i = 0; i<3;i++) {
+            for (int j = 0; j<3;j++) {
+                if ((x + i) <= cols && (y+j) <= rows && (x + i) > 0 && (y+j) > 0) {
+                    if (bs[i][j] != 0 && grid.get((x + i - 1), (y + j - 1)) != 0) {
+                        blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
+                    } else if (bs[i][j] != 0) {
+                        blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
+                    }
+                }
+            }
+        }
+    }
+    public void setNextPiece(GamePiece p){
+        nextPiece = p;
+        resetBoard();
+        target(x,y);
+    }
+    public void fadeOut(int[][] coords){
+        for (int[] coord: coords) {
+            blocks[coord[0]][coord[1]].fadeOut();
+
         }
     }
 

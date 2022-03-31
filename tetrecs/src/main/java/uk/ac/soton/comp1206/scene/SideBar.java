@@ -25,6 +25,7 @@ import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
+import uk.ac.soton.comp1206.component.PieceBoard;
 
 public class SideBar extends VBox {
     private static final Logger logger = LogManager.getLogger(SideBar.class);
@@ -81,9 +82,9 @@ public class SideBar extends VBox {
     }
     private Text addLabel(){
         Text text = new Text();
-        text.setFont(Font.font("Verdana", FontWeight.BOLD, FontPosture.REGULAR, 25));
+        text.setFont(Font.font("style/Orbitron-Black.ttf", FontWeight.BOLD, FontPosture.REGULAR, 25));
         text.setFill(Color.WHITE);
-        text.setStroke(Color.BLACK);
+        text.setStroke(Color.BLUE);
         text.setStrokeWidth(1);
         return text;
     }
@@ -109,6 +110,9 @@ public class SideBar extends VBox {
                 if(child instanceof SideBarLabel) {
                     ((SideBarLabel) child).toggleVisibility();
                 }
+                if(child instanceof PieceBoard) {
+                    ((PieceBoard) child).resize(0.5);
+                }
 
             }
             Duration duration = Duration.millis(512);
@@ -127,6 +131,9 @@ public class SideBar extends VBox {
                 for(var child : getChildren()) {
                     if(child instanceof SideBarLabel) {
                         ((SideBarLabel) child).toggleVisibility();
+                    }
+                    if(child instanceof PieceBoard) {
+                        ((PieceBoard) child).resize(2);
                     }
                 }
             });

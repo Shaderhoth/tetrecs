@@ -17,7 +17,6 @@ public class App extends Application {
      * Base resolution width
      */
     private final int width = 800;
-
     /**
      * Base resolution height
      */
@@ -44,7 +43,6 @@ public class App extends Application {
     public void start(Stage stage) {
         instance = this;
         this.stage = stage;
-
         //Open game window
         openGame();
     }
@@ -59,6 +57,8 @@ public class App extends Application {
         var gameWindow = new GameWindow(stage,width,height);
 
         //Display the GameWindow
+        String stylesheet = getClass().getResource("/style/game.css").toExternalForm();
+        gameWindow.getScene().getStylesheets().add(stylesheet);
         stage.show();
     }
 

@@ -4,7 +4,9 @@ import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.StringProperty;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -14,6 +16,7 @@ import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
+import uk.ac.soton.comp1206.utilities.Multimedia;
 
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
@@ -89,6 +92,7 @@ public class GameWindow {
      * Display the single player challenge
      */
     public void startChallenge() { loadScene(new ChallengeScene(this)); }
+    public void showInstructions() { loadScene(new InstructionsScene(this)); }
 
     /**
      * Setup the default settings for the stage itself (the window), such as the title and minimum width and height.
@@ -98,6 +102,7 @@ public class GameWindow {
         stage.setMinWidth(width);
         stage.setMinHeight(height + 20);
         stage.setOnCloseRequest(ev -> App.getInstance().shutdown());
+
     }
 
     /**
@@ -105,6 +110,7 @@ public class GameWindow {
      * @param newScene new scene to load
      */
     public void loadScene(BaseScene newScene) {
+        Multimedia.playAudio("transition.wav");
         //Cleanup remains of the previous scene
         cleanup();
 

@@ -5,9 +5,14 @@ import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
+import uk.ac.soton.comp1206.event.BlockClickedListener;
+import uk.ac.soton.comp1206.event.PieceSpawnedListener;
+import uk.ac.soton.comp1206.event.PiecesDestroyedListener;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
+import uk.ac.soton.comp1206.utilities.Multimedia;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -21,7 +26,12 @@ public class Game {
     private IntegerProperty lives = new SimpleIntegerProperty(3);
     private IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
+    private PieceSpawnedListener pieceSpawnedListener;
+    private PiecesDestroyedListener piecesDestroyedListener;
     private static final Logger logger = LogManager.getLogger(Game.class);
+    private int x = 0;
+    private int y = 0;
+
 
     /**
      * Number of rows
@@ -33,6 +43,7 @@ public class Game {
      */
     protected final int cols;
     private GamePiece currentPiece;
+    private GamePiece followingPiece;
     /**
      * The grid model linked to the game
      */
@@ -56,39 +67,28 @@ public class Game {
      */
     public void start() {
         logger.info("Starting game");
-        currentPiece = spawnPiece();
+        followingPiece = spawnPiece();
+        nextPiece();
         initialiseGame();
     }
 
-    /**
-     * Initialise a new game and set up anything that needs to be done at the start
-     */
     public void initialiseGame() {
         logger.info("Initialising game");
     }
 
-    /**
-     * Handle what should happen when a particular block is clicked
-     * @param gameBlock the block that was clicked
-     */
-    public void blockClicked(GameBlock gameBlock) {
-        /*
-        //Get the position of this block
-        int x = gameBlock.getX();
-        int y = gameBlock.getY();
-
-        //Get the new value for this block
-        int previousValue = grid.get(x,y);
-        int newValue = previousValue + 1;
-        if (newValue  > GamePiece.PIECES) {
-            newValue = 0;
+    public void updatePieceBoards(){
+        if (pieceSpawnedListener != null) {
+            pieceSpawnedListener.pieceSpawned(currentPiece, followingPiece);
+        }
+    }
+    public void blockClicked() {
+        if (grid.canPlayPiece(currentPiece,getX(),getY())){
+            grid.playPiece(currentPiece,getX(),getY());
+            Multimedia.playAudio("place.wav");
+        }else {
+            Multimedia.playAudio("explode.wav");
         }
 
-        //Update the grid with the new value
-        grid.set(x,y,newValue);
-
-         */
-        grid.playPiece(currentPiece,gameBlock.getX(),gameBlock.getY());
         afterPiece();
         nextPiece();
 
@@ -118,11 +118,38 @@ public class Game {
         return rows;
     }
 
+    public void setAim(int x, int y){
+        this.x = x;
+        this.y = y;
+    }
+    public int getX(){
+        return x;
+    }public int getY(){
+        return y;
+    }
+
     public GamePiece spawnPiece(){
-        return GamePiece.createPiece(new Random().nextInt(0,14));
+        GamePiece g = GamePiece.createPiece(new Random().nextInt(0,14));
+
+        return g;
+    }
+    public void setOnPieceSpawned(PieceSpawnedListener listener) {
+        this.pieceSpawnedListener = listener;
     }
     public void nextPiece(){
-        currentPiece = spawnPiece();
+        currentPiece = followingPiece;
+        followingPiece  = spawnPiece();
+        updatePieceBoards();
+    }
+    public void rotateCurrentPiece(int count){
+        currentPiece.rotate(count);
+        updatePieceBoards();
+    }
+    public void swapCurrentPiece(){
+        GamePiece temp = currentPiece;
+        currentPiece = followingPiece;
+        followingPiece  = temp;
+        updatePieceBoards();
     }
     public void score(int lines, int blocks){
         score.setValue(score.getValue() + lines * blocks * 10 * multiplier.getValue());
@@ -130,8 +157,8 @@ public class Game {
     }
 
     public void afterPiece(){
-        logger.info("Running afterPiece");
         ArrayList<Integer> columnsToClear = new ArrayList();
+        List<Integer[]> coords = new ArrayList<Integer[]>();
         int lines = 0;
         int blocks = 0;
         int count;
@@ -142,9 +169,7 @@ public class Game {
                     count++;
                 }
             }
-            logger.info("Column: " + i + " Count: " + count);
             if (count == getRows()){
-                logger.info("Clearing column " + i);
                 columnsToClear.add(i);
                 lines++;
             }
@@ -156,13 +181,11 @@ public class Game {
                     count++;
                 }
             }
-            logger.info("Row: " + i + " Count: " + count);
             if (count == getCols()){
-                logger.info("Clearing row " + i);
                 lines++;
                 for (int j = 0; j < getCols(); j++) {
                     if (grid.get(j,i) != 0){
-                        grid.set(j,i,0);
+                        coords.add(new Integer[]{j, i});
                         blocks++;
                     }
 
@@ -172,10 +195,17 @@ public class Game {
         for (Integer col: columnsToClear) {
             for (int i = 0; i < getRows(); i++) {
                 if (grid.get(col,i) != 0){
-                    grid.set(col,i,0);
+                    coords.add(new Integer[]{col, i});
                     blocks++;
                 }
             }
+        }
+        if (piecesDestroyedListener != null && coords.size() > 0) {
+            int[][] cs = new int[coords.size()][2];
+            for (int i = 0; i < coords.size(); i++) {
+                cs[i] = new int[]{coords.get(i)[0], coords.get(i)[1]};
+            }
+            piecesDestroyedListener.piecesDestroyed(cs);
         }
         score(lines, blocks);
         if (lines > 0){
@@ -184,6 +214,9 @@ public class Game {
             multiplier.setValue(1);
         }
 
+    }
+    public void setOnPiecesDestroyed(PiecesDestroyedListener listener) {
+        this.piecesDestroyedListener = listener;
     }
     public IntegerProperty scoreProperty() {
         return score;

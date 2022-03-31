@@ -36,7 +36,7 @@ public class SideBarLabel extends HBox {
         getChildren().add(image);
     }private Text addLabel(String t){
         Text text = new Text(t);
-        text.setFont(Font.font("Verdana", FontWeight.BOLD, FontPosture.REGULAR, 25));
+        text.setFont(Font.font("style/Orbitron-Black.ttf", FontWeight.BOLD, FontPosture.REGULAR, 25));
         text.setFill(Color.WHITE);
         text.setStroke(Color.BLACK);
         text.setStrokeWidth(1);

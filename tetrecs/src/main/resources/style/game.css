@@ -21,23 +21,28 @@
 }
 
 .menuItem {
-    -fx-fill: white;
-    -fx-font-family: 'Orbitron';
-    -fx-font-size: 32px;
-    -fx-font-weight: 700;
-    -fx-border-color: black;
+    -fx-text-fill: white;
+    -fx-border-width: 2;
+    -fx-border-color: #990099;
+    -fx-background-color: #000000;
+    -fx-background-color: #000000;
+    -fx-font-family: 'Orbitron-Black';
     -fx-stroke: black;
-    -fx-effect: dropshadow(gaussian, black, 1, 1.0, 1, 1);
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 2, 2);
 }
 
 .menuItem:hover {
-    -fx-fill: yellow;
+    -fx-background-color: #003333;
 }
 
 .menuItem.selected {
-    -fx-fill: yellow;
+    -fx-background-color: #009999;
 }
-
+.menuText{
+    -fx-fill: yellow;
+    -fx-font-family: 'Orbitron-Black';
+    -fx-font-size: 24px;
+}
 .bigtitle {
     -fx-fill: yellow;
     -fx-font-family: 'Orbitron';

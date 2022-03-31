@@ -4,6 +4,7 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.utilities.Multimedia;
 
 import java.time.format.DateTimeFormatter;
 
@@ -122,18 +123,25 @@ public class Grid {
         return true;
     }
     public void playPiece(GamePiece piece, int x,int y){
-        logger.info("Playing " + piece.getValue() + " at (" +x+","+y+")");
+        logger.info(("Playing {} at (" +x+","+y+")"), piece);
         int[][] blocks = piece.getBlocks();
-        if (canPlayPiece(piece,x,y)){
-            for (int i = 0; i<3;i++) {
-                for (int j = 0; j<3;j++) {
-                    if (blocks[i][j] != 0 ){
-                        set((x + i - 1),(y+j-1),blocks[i][j]);
-                    }
+        for (int i = 0; i<3;i++) {
+            for (int j = 0; j<3;j++) {
+                if (blocks[i][j] != 0 ){
+                    logger.info("(" + (x + i - 1)+"," + (y+j-1) + ") = " + blocks[i][j]);
+                    set((x + i - 1),(y+j-1),blocks[i][j]);
                 }
             }
         }
     }
+    public void clear(){
+        for (int i = 0; i < cols; i++) {
+            for (int j = 0; j < rows; j++) {
+                set(i,j,0);
+            }
+        }
+    }
+
 
 
 }
