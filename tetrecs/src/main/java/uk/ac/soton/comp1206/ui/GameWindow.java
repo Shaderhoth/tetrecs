@@ -86,12 +86,22 @@ public class GameWindow {
      */
     public void startMenu() {
         loadScene(new MenuScene(this));
+    }public void startEnd(int score) {
+        loadScene(new EndScene(this, score));
+    }
+    public void startScore(int score) {
+        loadScene(new ScoreScene(this, score));
+    }
+    public void startScore() {
+        loadScene(new ScoreScene(this));
     }
 
     /**
      * Display the single player challenge
      */
-    public void startChallenge() { loadScene(new ChallengeScene(this)); }
+    public void startChallenge() {
+        loadScene(new ChallengeScene(this));
+    }
     public void showInstructions() { loadScene(new InstructionsScene(this)); }
 
     /**

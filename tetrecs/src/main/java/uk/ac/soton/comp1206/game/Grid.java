@@ -128,7 +128,6 @@ public class Grid {
         for (int i = 0; i<3;i++) {
             for (int j = 0; j<3;j++) {
                 if (blocks[i][j] != 0 ){
-                    logger.info("(" + (x + i - 1)+"," + (y+j-1) + ") = " + blocks[i][j]);
                     set((x + i - 1),(y+j-1),blocks[i][j]);
                 }
             }

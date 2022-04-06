@@ -108,8 +108,11 @@ public class GameBlock extends Canvas {
     /**
      * Handle painting of the block canvas
      */
-    public void paint() {
+    public void reset() {
         currentlyCovered = 0;
+        paint();
+    }
+    public void paint() {
         //If the block is empty, paint as empty
         if(value.get() == 0) {
             paintEmpty();
@@ -122,20 +125,17 @@ public class GameBlock extends Canvas {
     /**
      * Paint this canvas empty
      */
-    public void fadeOut(){
-        int tempColour = getValue();
-        getGameBoard().grid.set(getX(),getY(),0);
+    public void fadeOut(int tempColour){
         AnimationTimer timer = new AnimationTimer(){
             int speed = 100;
-            int i = 100;
+            int i = 110;
             long lastTick = 0;
             @Override
             public void handle(long now){
                 if (i<=0){
-                    int temp = currentlyCovered;
-                    paint();
-                    if (temp > 0){
-                        paintOver(temp);
+                    paintEmpty();
+                    if (currentlyCovered != 0){
+                        paintOver(currentlyCovered);
                     }
                     stop();
                 }
@@ -144,7 +144,15 @@ public class GameBlock extends Canvas {
                     return;
                 }
                 else if(now - lastTick > 1000000000 / speed){
-                    paintFade(tempColour, (float) i / 100);
+                    if (i>100){
+                        if (i%2 == 0){
+                            paintColor(COLOURS[tempColour]);
+                        }else{
+                            paintEmpty();
+                        }
+                    }else {
+                        paintFade(tempColour, (float) i / 100);
+                    }
                     if (currentlyCovered != 0){
                         paintOver(currentlyCovered);
                     }
@@ -192,12 +200,12 @@ public class GameBlock extends Canvas {
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(2, 4), 16) * 0.8)),
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(4, 6), 16) * 0.8)),
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(6, 8), 16) * 0.8)),
-                Math.toIntExact(Math.round(Integer.valueOf(c.substring(8, 10), 16)/255))
+                Math.toIntExact(Math.round(Integer.valueOf(c.substring(8, 10), 16))/255)
         )), new Stop(1, Color.rgb(
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(2, 4), 16) * 0.4)),
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(4, 6), 16) * 0.4)),
                 Math.toIntExact(Math.round(Integer.valueOf(c.substring(6, 8), 16) * 0.4)),
-                Math.toIntExact(Math.round(Integer.valueOf(c.substring(8, 10), 16)/255))
+                Math.toIntExact(Math.round(Integer.valueOf(c.substring(8, 10), 16))/255)
         ))};
 
 

@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.component.MenuOption;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.utilities.Multimedia;
@@ -61,6 +62,7 @@ public class MenuScene extends BaseScene {
 
         options.getChildren().add(createButton("SINGLE PLAYER"));
         options.getChildren().add(createButton("MULTI PLAYER"));
+        options.getChildren().add(createButton("SCORES"));
         options.getChildren().add(createButton("INSTRUCTIONS"));
         options.getChildren().add(createButton("OPTIONS"));
         options.setAlignment(Pos.CENTER_RIGHT);
@@ -90,6 +92,8 @@ public class MenuScene extends BaseScene {
             button.setOnMouseClicked(this::startGame);
         }else if (name.equals("INSTRUCTIONS")) {
             button.setOnMouseClicked(this::showInstructions);
+        }else if (name.equals("SCORES")) {
+            button.setOnMouseClicked(this::showScores);
         }
 
         return button;
@@ -119,6 +123,8 @@ public class MenuScene extends BaseScene {
         gameWindow.startChallenge();
     }private void showInstructions(MouseEvent event) {
         gameWindow.showInstructions();
+    }private void showScores(MouseEvent event) {
+        gameWindow.startScore();
     }
 
 }

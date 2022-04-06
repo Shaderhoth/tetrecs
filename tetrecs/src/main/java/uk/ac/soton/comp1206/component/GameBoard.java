@@ -1,5 +1,6 @@
 package uk.ac.soton.comp1206.component;
 
+import javafx.animation.AnimationTimer;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
@@ -199,7 +200,7 @@ public class GameBoard extends GridPane {
     public void resetBoard(){
         for(var y = 0; y < rows; y++) {
             for (var x = 0; x < cols; x++) {
-                blocks[x][y].paint();
+                blocks[x][y].reset();
             }
         }
 
@@ -208,14 +209,16 @@ public class GameBoard extends GridPane {
         this.x = x;
         this.y = y;
         blocks[x][y].drawCircle();
-        int[][] bs = nextPiece.getBlocks();
-        for (int i = 0; i<3;i++) {
-            for (int j = 0; j<3;j++) {
-                if ((x + i) <= cols && (y+j) <= rows && (x + i) > 0 && (y+j) > 0) {
-                    if (bs[i][j] != 0 && grid.get((x + i - 1), (y + j - 1)) != 0) {
-                        blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
-                    } else if (bs[i][j] != 0) {
-                        blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
+        if (nextPiece != null) {
+            int[][] bs = nextPiece.getBlocks();
+            for (int i = 0; i < 3; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if ((x + i) <= cols && (y + j) <= rows && (x + i) > 0 && (y + j) > 0) {
+                        if (bs[i][j] != 0 && grid.get((x + i - 1), (y + j - 1)) != 0) {
+                            blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
+                        } else if (bs[i][j] != 0) {
+                            blocks[x + i - 1][y + j - 1].paintOver(nextPiece.getValue());
+                        }
                     }
                 }
             }
@@ -224,13 +227,34 @@ public class GameBoard extends GridPane {
     public void setNextPiece(GamePiece p){
         nextPiece = p;
         resetBoard();
+        logger.info("Reset board");
         target(x,y);
     }
     public void fadeOut(int[][] coords){
-        for (int[] coord: coords) {
-            blocks[coord[0]][coord[1]].fadeOut();
+        AnimationTimer timer = new AnimationTimer(){
+            int speed = 5;
+            long lastTick = 0;
+            int i = 0;
+            @Override
+            public void handle(long now){
+                if (i>= coords.length){
+                    stop();
+                }
+                else if(lastTick == 0 ){
+                    lastTick = now ;
+                    return;
+                }
+                else if(now - lastTick > 1000000000 / speed){
+                    lastTick = now ;
+                    int[] coord = coords[i];
+                    blocks[coord[0]][coord[1]].fadeOut(blocks[coord[0]][coord[1]].getValue());
+                    grid.set(coord[0],coord[1],0);
+                    i++;
+                }
 
-        }
+            }
+        };
+        timer.start();
     }
 
 }

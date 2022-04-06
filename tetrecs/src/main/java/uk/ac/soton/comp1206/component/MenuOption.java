@@ -1,19 +1,8 @@
-package uk.ac.soton.comp1206.scene;
+package uk.ac.soton.comp1206.component;
 
-import javafx.beans.value.ChangeListener;
-import javafx.geometry.Insets;
+
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Box;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 
 public class MenuOption extends HBox{

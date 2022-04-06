@@ -1,4 +1,4 @@
-package uk.ac.soton.comp1206.scene;
+package uk.ac.soton.comp1206.component;
 
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;

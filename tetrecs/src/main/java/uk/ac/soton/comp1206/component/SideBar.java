@@ -1,20 +1,10 @@
-package uk.ac.soton.comp1206.scene;
+package uk.ac.soton.comp1206.component;
 
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.CheckBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -24,16 +14,17 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import uk.ac.soton.comp1206.App;
-import uk.ac.soton.comp1206.component.PieceBoard;
+
+import java.util.Timer;
 
 public class SideBar extends VBox {
     private static final Logger logger = LogManager.getLogger(SideBar.class);
-    private VBox side;
     private Text score;
+    private Text topScore;
     private Text level;
     private Text lives;
     private Text multiplier;
+    private UITimer timer;
     private CheckBox mute;
     private HBox imgBox = new HBox();
     private final int width = 256;
@@ -55,6 +46,11 @@ public class SideBar extends VBox {
         imgBox = new SideBarLabel();
         getChildren().add(imgBox);
 
+        timer = new UITimer(width, 32, 12000);
+        getChildren().add(timer);
+
+        topScore = addLabel();
+        addBox(topScore, "Top Score");
         score = addLabel();
         addBox(score, "Score");
         level = addLabel();
@@ -80,6 +76,9 @@ public class SideBar extends VBox {
         */
         imgBox.setOnMouseClicked((e) -> toggleSidebar());
     }
+    public void setTimer(int time){
+        timer.resetTimer(time);
+    }
     private Text addLabel(){
         Text text = new Text();
         text.setFont(Font.font("style/Orbitron-Black.ttf", FontWeight.BOLD, FontPosture.REGULAR, 25));
@@ -95,6 +94,8 @@ public class SideBar extends VBox {
 
     public Text getScoreField() {
         return score;
+    }public Text getTopScoreField() {
+        return topScore;
     }public Text getLevelField() {
         return level;
     }public Text getLivesField() {

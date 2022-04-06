@@ -1,24 +1,28 @@
 package uk.ac.soton.comp1206.scene;
 
-import javafx.beans.property.Property;
+import javafx.application.Platform;
+import javafx.beans.Observable;
 import javafx.event.EventHandler;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
-import javafx.scene.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
+import uk.ac.soton.comp1206.component.SideBar;
+import uk.ac.soton.comp1206.event.GameOverListener;
 import uk.ac.soton.comp1206.event.PieceSpawnedListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
+import uk.ac.soton.comp1206.utilities.FileHandler;
 import uk.ac.soton.comp1206.utilities.Multimedia;
+
+import java.util.function.Consumer;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
@@ -26,10 +30,13 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
 public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
 
     private static final Logger logger = LogManager.getLogger(ChallengeScene.class);
+    private GameOverListener gameOverListener;
     private PieceBoard pieceBoard;
     private PieceBoard nextpieceBoard;
     private GameBoard board;
     private SideBar sidePane;
+    public int topScore;
+    Multimedia media;
     protected Game game;
 
     /**
@@ -46,10 +53,11 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
      */
     @Override
     public void build() {
+
         logger.info("Building " + this.getClass().getName());
 
         setupGame();
-        Multimedia media = new Multimedia("game.wav");
+        media = new Multimedia("game.wav");
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
 
         var challengePane = new StackPane();
@@ -66,8 +74,10 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
 
         sidePane = new SideBar();
         mainPane.setRight(sidePane);
+
+        sidePane.getTopScoreField().textProperty().bind(game.topScoreProperty().asString());
         sidePane.getScoreField().textProperty().bind(game.scoreProperty().asString());
-        sidePane.getLevelField().textProperty().bind(game.livesProperty().asString());
+        sidePane.getLevelField().textProperty().bind(game.levelProperty().asString());
         sidePane.getLivesField().textProperty().bind(game.livesProperty().asString());
         sidePane.getMultiplierField().textProperty().bind(game.multiplierProperty().asString());
         pieceBoard = new PieceBoard(128,128);
@@ -81,13 +91,31 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         nextpieceBoard.setOnBlockClick(this::swapPiece);
         game.setOnPieceSpawned(this::pieceSpawned);
         game.setOnPiecesDestroyed(this::piecesDestroyed);
+        game.setOnGameLoop(this::gameLooped);
+        game.scoreProperty().addListener(this::checkLevelUp);
+
+        game.setOnGameOver(this::checkGameOver);
+
+
 
     }
 
-    /**
-     * Handle when a block is clicked
-     * @param gameBlock the Game Block that was clocked
-     */
+    private void checkLevelUp(Observable observable) {
+        if (game.scoreProperty().getValue()/1000 > game.levelProperty().getValue()) {
+            game.levelProperty().setValue(game.scoreProperty().getValue()/1000 );
+        }
+    }private void checkGameOver() {
+        Platform.runLater(this::gameOver);
+    }
+    public void gameOver() {
+        Multimedia.playAudio("fail.wav");
+        gameWindow.startScore(game.scoreProperty().getValue());
+
+    }
+    private void gameLooped(int time){
+        logger.info("Setting timer " + time);
+        sidePane.setTimer(time);
+    }
     private void blockHovered(MouseEvent event, GameBlock gameBlock) {
         board.resetBoard();
         game.setAim(gameBlock.getX(), gameBlock.getY());
@@ -135,6 +163,11 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         game.setAim(game.getX()+x, game.getY()+y);
         board.target(game.getX(),game.getY());
     }
+    private void exit(){
+        media.stop();
+        game.endTimer();
+        gameWindow.startMenu();
+    }
 
     /**
      * Initialise the scene and start the game
@@ -145,7 +178,7 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
-                    case ESCAPE:    gameWindow.startMenu(); break;
+                    case ESCAPE:    exit(); break;
                     case W:
                     case UP:
                         moveAim(0, -1); break;

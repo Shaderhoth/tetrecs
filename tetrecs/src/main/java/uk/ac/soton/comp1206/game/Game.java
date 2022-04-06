@@ -1,19 +1,18 @@
 package uk.ac.soton.comp1206.game;
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
-import uk.ac.soton.comp1206.event.BlockClickedListener;
-import uk.ac.soton.comp1206.event.PieceSpawnedListener;
-import uk.ac.soton.comp1206.event.PiecesDestroyedListener;
+import uk.ac.soton.comp1206.event.*;
 import uk.ac.soton.comp1206.scene.ChallengeScene;
+import uk.ac.soton.comp1206.utilities.FileHandler;
 import uk.ac.soton.comp1206.utilities.Multimedia;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.Semaphore;
 
 /**
  * The Game class handles the main logic, state and properties of the TetrECS game. Methods to manipulate the game state
@@ -22,16 +21,20 @@ import java.util.Random;
 public class Game {
 
     private IntegerProperty score = new SimpleIntegerProperty(0);
+    private IntegerProperty topScore = new SimpleIntegerProperty(0);
     private IntegerProperty level = new SimpleIntegerProperty(0);
     private IntegerProperty lives = new SimpleIntegerProperty(3);
     private IntegerProperty multiplier = new SimpleIntegerProperty(1);
 
     private PieceSpawnedListener pieceSpawnedListener;
     private PiecesDestroyedListener piecesDestroyedListener;
+    private GameLoopListener gameLoopListener;
+    private GameOverListener gameOverListener;
     private static final Logger logger = LogManager.getLogger(Game.class);
     private int x = 0;
     private int y = 0;
-
+    private Timer timer;
+    private TimerTask task;
 
     /**
      * Number of rows
@@ -55,13 +58,70 @@ public class Game {
      * @param rows number of rows
      */
     public Game(int cols, int rows) {
+        try {
+            FileHandler file = new FileHandler("scores.txt");
+            file.setReader();
+            topScore.set(Integer.valueOf(file.getLine().split(":")[1]));
+        } catch (Exception e) {
+            logger.error(e);
+            topScore.set(0);
+        }
         this.cols = cols;
         this.rows = rows;
 
         //Create a new grid model to represent the game state
         this.grid = new Grid(cols,rows);
-    }
+        resetTimer();
+        logger.info("Timer");
 
+    }
+    private void resetTimer(){
+        if (timer != null) {
+            timer.cancel();
+        }
+        if (gameLoopListener != null) {
+            gameLoopListener.gameLoop(getTimerDelay());
+        }
+        timer = new Timer();
+        task = new TimerTask() {
+            @Override
+            public void run() {
+                gameLoop();
+                if (livesProperty().getValue()<0){
+                    if (gameLoopListener != null) {
+                        gameLoopListener.gameLoop(-1);
+                    }
+                    cancel();
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(task, getTimerDelay(), getTimerDelay());
+
+    }public void endTimer(){
+        if (timer != null) {
+            timer.cancel();
+        }
+
+    }
+    public void setOnGameLoop(GameLoopListener listener) {
+        this.gameLoopListener = listener;
+    }
+    public void setOnGameOver(GameOverListener listener) {
+        this.gameOverListener = listener;
+    }
+    private void gameLoop(){
+        livesProperty().set(livesProperty().get()-1);
+        if (livesProperty().getValue() <0){
+            if (gameOverListener != null) {
+                gameOverListener.gameOver();
+            }
+        }
+        nextPiece();
+        multiplierProperty().set(1);
+        if (gameLoopListener != null) {
+            gameLoopListener.gameLoop(getTimerDelay());
+        }
+    }
     /**
      * Start the game
      */
@@ -70,6 +130,7 @@ public class Game {
         followingPiece = spawnPiece();
         nextPiece();
         initialiseGame();
+
     }
 
     public void initialiseGame() {
@@ -91,6 +152,7 @@ public class Game {
 
         afterPiece();
         nextPiece();
+        resetTimer();
 
     }
 
@@ -153,6 +215,7 @@ public class Game {
     }
     public void score(int lines, int blocks){
         score.setValue(score.getValue() + lines * blocks * 10 * multiplier.getValue());
+        topScore.setValue(Math.max(score.getValue(), topScore.getValue()));
 
     }
 
@@ -220,12 +283,20 @@ public class Game {
     }
     public IntegerProperty scoreProperty() {
         return score;
+    }public IntegerProperty topScoreProperty() {
+        return topScore;
     }public IntegerProperty levelProperty() {
         return level;
     }public IntegerProperty livesProperty() {
         return lives;
     }public IntegerProperty multiplierProperty() {
         return multiplier;
+    }public int getTimerDelay(){
+        if (12000 - 500 * levelProperty().get() > 2500){
+            return 12000 - 500 * levelProperty().get();
+        }else {
+            return  2500;
+        }
     }
 
 }
