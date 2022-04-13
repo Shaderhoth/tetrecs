@@ -6,11 +6,29 @@ import javafx.scene.paint.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+ * An animated image to represent the amount of time the user has remaining to make their move
+ */
 public class UITimer extends Canvas {
-    private static final Logger logger = LogManager.getLogger(UITimer.class);
+    /**
+     * The width of the timer
+     */
     private double width;
+    /**
+     * The height of the timer
+     */
     private double height;
+    /**
+     * The Animation timer which updates the image
+     */
     private AnimationTimer timer;
+
+    /**
+     * Initialise the timer
+     * @param width the width of the timer object
+     * @param height the height of the timer object
+     * @param time the amount of time for the timer to count down
+     */
     public UITimer(double width, double height, int time) {
         this.width = width;
         this.height = height;
@@ -24,6 +42,11 @@ public class UITimer extends Canvas {
         resetTimer(time);
 
     }
+
+    /**
+     * Resize the timer
+     * @param factor the scale factor by which to resize
+     */
     public void rs(double factor){
         this.width = width;
         this.height = height;
@@ -35,6 +58,11 @@ public class UITimer extends Canvas {
         setWidth(width);
         setHeight(height);
     }
+
+    /**
+     * Reset the timer once complete or if the user has made a move
+     * @param time
+     */
     public void resetTimer(int time){
         if (timer != null){
             timer.stop();
@@ -43,7 +71,13 @@ public class UITimer extends Canvas {
             paint();
             makeTimer(time);
         }
-    }private void makeTimer(int time){
+    }
+
+    /**
+     * Create an animation to represent the countdown of the timer
+     * @param time the amount of thime the timer is supposed to count down
+     */
+    private void makeTimer(int time){
         timer = new AnimationTimer(){
             long startTick = 0;
             @Override
@@ -61,6 +95,10 @@ public class UITimer extends Canvas {
         };
         timer.start();
     }
+
+    /**
+     * Render them background of the timer
+     */
     private void paint() {
         var gc = getGraphicsContext2D();
 
@@ -77,6 +115,10 @@ public class UITimer extends Canvas {
         gc.strokeRect(0,0,width,height);
     }
 
+    /**
+     * Paint on the colour for the coloured countdown bar
+     * @param percent the percent of time remaining
+     */
     private void paintTimer(double percent) {
         var gc = getGraphicsContext2D();
 

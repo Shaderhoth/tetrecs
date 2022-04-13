@@ -110,6 +110,14 @@ public class Grid {
         return rows;
     }
 
+    /**
+     * Checks if a user can play a piece in the targeted location
+     * @param piece the current piece supposed to be played
+     * @param x the horizontal aspect of the targeted location
+     * @param y the vertical aspect of the target location
+     * @return whether the piece can be played
+     * @see GamePiece
+     */
     public boolean canPlayPiece(GamePiece piece, int x,int y){
         logger.info("Can play " + piece.getValue() + " at (" +x+","+y+")?");
         int[][] blocks = piece.getBlocks();
@@ -122,6 +130,14 @@ public class Grid {
         }
         return true;
     }
+
+    /**
+     * Places a piece in the targeted location
+     * @param piece the current piece supposed to be played
+     * @param x the horizontal aspect of the targeted location
+     * @param y the vertical aspect of the target location
+     * @see GamePiece
+     */
     public void playPiece(GamePiece piece, int x,int y){
         logger.info(("Playing {} at (" +x+","+y+")"), piece);
         int[][] blocks = piece.getBlocks();
@@ -133,6 +149,10 @@ public class Grid {
             }
         }
     }
+
+    /**
+     * Clears the grid
+     */
     public void clear(){
         for (int i = 0; i < cols; i++) {
             for (int j = 0; j < rows; j++) {

@@ -19,21 +19,52 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.scene.ScoreScene;
 
+/**
+ * A Pane containing all the scores
+ */
 public class ScoresList extends VBox {
+    /**
+     * A logger for debugging purposes
+     */
     private static final Logger logger = LogManager.getLogger(ScoresList.class);
+    /**
+     * The score achieved in the most recent game by the user
+     */
     private Pair<SimpleStringProperty, Integer> newScore = null;
-
+    /**
+     * A list of all the scores
+     */
     SimpleListProperty<Pair<SimpleStringProperty, Integer>> scores;
+    /**
+     * The entry location of the players name
+     */
     private TextField name = null;
+    /**
+     * The Animation timer to trigger the animation displaying the scores
+     */
     private AnimationTimer timer;
+    /**
+     * The location of the user on the scoreboard
+     */
     private Integer index = -1;
 
+    /**
+     * Initialise the list with the top scores
+     * @param scores list of scores (paired with names)
+     */
     public ScoresList(SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
         this.scores = scores;
         setAlignment(Pos.CENTER);
         scores.addListener(this::resetList);
         setAlignment(Pos.CENTER);
-    }public ScoresList(SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores, Integer index){
+    }
+
+    /**
+     * Initialise the list using the top scores including the index of the user on the scoreboard
+     * @param scores list of scores (paired with names)
+     * @param index the index location of the user on the scoreboard
+     */
+    public ScoresList(SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores, Integer index){
         this.scores = scores;
         this.index = index;
         setAlignment(Pos.CENTER);
@@ -41,10 +72,19 @@ public class ScoresList extends VBox {
         setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Activates when scores are updated
+     * @param change the change in the scores
+     */
     private void resetList(ListChangeListener.Change<? extends Pair> change) {
         setList();
     }
 
+    /**
+     * Makes a score Pane
+     * @param score the Score object containing the username and value of the score
+     * @return the pane containing the information on the score
+     */
     public BorderPane makeScore(Pair<SimpleStringProperty, Integer> score){
         BorderPane pane = new BorderPane();
         pane.setMinWidth(getWidth()*4/5);
@@ -63,7 +103,15 @@ public class ScoresList extends VBox {
         pane.setLeft(name);
         return pane;
 
-    }public BorderPane makeNewScore(Pair<SimpleStringProperty, Integer> score){
+    }
+
+    /**
+     * Generates a score pane with a modifiable name
+     * Used if the score was achieved by the player on the most recent round
+     * @param score the Score object containing the username and value of the score
+     * @return the pane containing the information on the score
+     */
+    public BorderPane makeNewScore(Pair<SimpleStringProperty, Integer> score){
         BorderPane pane = new BorderPane();
         pane.setMinWidth(getWidth()*4/5);
         pane.setMaxWidth(getWidth()*4/5);
@@ -89,9 +137,19 @@ public class ScoresList extends VBox {
 
         return pane;
 
-    }public TextField getNameField(){
+    }
+
+    /**
+     * returns the name field containing the user's score
+     * @return the input box containing the name of the user
+     */
+    public TextField getNameField(){
         return name;
     }
+
+    /**
+     * clears the list of scores and stops the timer from adding new scores
+     */
     public void clearList(){
         if (timer != null){
             timer.stop();
@@ -101,10 +159,18 @@ public class ScoresList extends VBox {
         }
     }
 
+    /**
+     * refreshes the list
+     */
     private void setList(){
         clearList();
         reveal();
-    }public void reveal(){
+    }
+
+    /**
+     * displays the list of scores using an animation
+     */
+    public void reveal(){
         clearList();
         timer = new AnimationTimer() {
             int speed = 10;
@@ -131,8 +197,5 @@ public class ScoresList extends VBox {
             }
         };
         timer.start();
-    }
-    public SimpleListProperty getScoresList(){
-        return scores;
     }
 }

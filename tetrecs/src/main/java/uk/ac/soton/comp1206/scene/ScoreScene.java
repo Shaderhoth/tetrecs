@@ -31,32 +31,77 @@ import java.util.ArrayList;
 
 
 public class ScoreScene extends BaseScene {
-
+    /**
+     * Do I have to do this every time?
+     * It is used to make reports of useful information, so you can see what your program is doing
+     */
     private static final Logger logger = LogManager.getLogger(ScoreScene.class);
+    /**
+     * You use this to talk to the server
+     */
     private static final Communicator communicator = new Communicator("ws://ofb-labs.soton.ac.uk:9700");
-    private CommunicationsListener communicationsListener;
+    /**
+     * The score you achieved
+     */
     private int score = 0;
+    /**
+     * The pane containing the list of scores
+     */
     private VBox mainPane;
+    /**
+     * The list of local scores
+     */
     private SimpleListProperty<Pair<SimpleStringProperty,Integer>> localScores = new SimpleListProperty();
+    /**
+     * The list of remote scores
+     */
     private SimpleListProperty<Pair<SimpleStringProperty,Integer>> remoteScores = new SimpleListProperty();
+    /**
+     * The pane containing the local scores
+     */
     private VBox localScorePane;
+    /**
+     * the pane containing the remote scores
+     */
     private VBox remoteScorePane;
+    /**
+     * The main pane
+     */
     private StackPane scorePane;
+    /**
+     * The media player
+     */
     private Multimedia media;
+    /**
+     * The newly achieved score
+     */
     private Pair newScore;
+    /**
+     * The name of the player
+     */
     private SimpleStringProperty name = new SimpleStringProperty("Player");
+    /**
+     * Toggle whether local or global scores are showing
+     */
     private boolean global = false;
-
+    /**
+     * the location of the local scores file
+     */
     private String fileName = "scores.txt";
     /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
+     * @param score the newly achieved score
      */
     public ScoreScene(GameWindow gameWindow, int score) {
         super(gameWindow);
         this.score = score;
         logger.info("Creating End Scene");
-    }public ScoreScene(GameWindow gameWindow) {
+    }
+    /**
+     * Create a new menu scene
+     * @param gameWindow the Game Window this will be displayed in
+     */public ScoreScene(GameWindow gameWindow) {
         super(gameWindow);
         logger.info("Creating End Scene");
     }
@@ -67,6 +112,7 @@ public class ScoreScene extends BaseScene {
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
+        media = new Multimedia("menu.mp3");
 
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
@@ -80,6 +126,10 @@ public class ScoreScene extends BaseScene {
         loadScores();
 
     }
+
+    /**
+     * Toggle which pane is showing
+     */
     private void toggleScreen(){
         if (localScorePane != null && remoteScorePane != null){
             for (Node pane:scorePane.getChildren()) {
@@ -97,6 +147,13 @@ public class ScoreScene extends BaseScene {
             }
         }
     }
+
+    /**
+     * Makes a pane containing a ScoreList using a list of scores
+     * @param titleText the title of the list
+     * @param scores the list of scores
+     * @return the Pane containing the Score List
+     */
     private VBox makePane(String titleText, SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
         mainPane = new VBox();
         Text title = new Text(titleText);
@@ -127,6 +184,10 @@ public class ScoreScene extends BaseScene {
 
         return mainPane;
     }
+
+    /**
+     * Load the local and remote scores
+     */
     private void loadScores(){
         loadOnlineScores();
         loadLocalScores(fileName);
@@ -137,6 +198,12 @@ public class ScoreScene extends BaseScene {
         scorePane.getChildren().add(localScorePane);
     }
 
+    /**
+     * Execute whenever your name is updated
+     * @param observableValue the trigger event
+     * @param s the original name
+     * @param s1 the new name
+     */
     private void nameUpdated(ObservableValue<? extends String> observableValue, String s, String s1) {
         logger.info("nameUpdated");
         for (Pair score: localScores) {
@@ -146,17 +213,33 @@ public class ScoreScene extends BaseScene {
         writeScores(fileName);
     }
 
-
+    /**
+     * Make a Score list using a list of scores with the user's score containing a modifiable name
+     * @param scores the list of scores
+     * @param index the location of the user's score
+     * @return the created ScoreList node
+     */
     private ScoresList makeScores(SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores, int index){
         ScoresList scoresList = new ScoresList(scores, index);
         return scoresList;
 
     }
+
+    /**
+     * Make a Score list using a list of scores
+     * @param scores the list of scores
+     * @return the created ScoreList node
+     */
     private ScoresList makeScores(SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
         ScoresList scoresList = new ScoresList(scores);
         return scoresList;
 
     }
+
+    /**
+     * Load the local scores from a scores file
+     * @param fileName the name of the file containing the scores
+     */
     private void loadLocalScores(String fileName){
         ArrayList<Pair<SimpleStringProperty,Integer>> tempList= new ArrayList<>();
         FileHandler file = new FileHandler(fileName);
@@ -179,12 +262,21 @@ public class ScoreScene extends BaseScene {
 
 
     }
+
+    /**
+     * Requests the online scores
+     */
     private void loadOnlineScores(){
         communicator.addListener((message) -> Platform.runLater(() -> this.receiveMessage(message)));
         communicator.send("HISCORES");
 
 
     }
+
+    /**
+     * Handle incoming messages from the server
+     * @param message the received message
+     */
     private void receiveMessage(String message){
         if (message.startsWith("HISCORES")){
             ArrayList<Pair<SimpleStringProperty,Integer>> tempList= new ArrayList<>();
@@ -198,6 +290,11 @@ public class ScoreScene extends BaseScene {
 
         }
     }
+
+    /**
+     * Write the scores to a file
+     * @param fileName the file to write the scores to
+     */
     private void writeScores(String fileName){
         logger.info("Writing Scores");
         FileHandler file = new FileHandler(fileName);
@@ -208,10 +305,19 @@ public class ScoreScene extends BaseScene {
         }
         file.writeFinish();
     }
+
+    /**
+     * Save your score and exit
+     */
     private void exit(){
         writeOnlineScore();
+        media.stop();
         gameWindow.startMenu();
     }
+
+    /**
+     * Upload your score to the server
+     */
     private void writeOnlineScore(){
         communicator.send(("HISCORE " + name.getValue() + ":" + score));
         logger.info("Sent: " + ("HISCORE " + name.getValue() + ":" + score));
@@ -219,7 +325,7 @@ public class ScoreScene extends BaseScene {
 
 
     /**
-     * Initialise the menu
+     * Initialise the scene
      */
     @Override
     public void initialise() {

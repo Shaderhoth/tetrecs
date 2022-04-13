@@ -26,17 +26,34 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
  * methods here to add more screens to the game.
  */
 public class GameWindow {
-
+    /**
+     * ...
+     * Posts info to the console
+     */
     private static final Logger logger = LogManager.getLogger(GameWindow.class);
-
+    /**
+     * the width of the window
+     */
     private final int width;
+    /**
+     * The height of the window
+     */
     private final int height;
-
+    /**
+     * The Stage
+     */
     private final Stage stage;
-
+    /**
+     * The current scene being shown
+     */
     private BaseScene currentScene;
+    /**
+     * The current scene
+     */
     private Scene scene;
-
+    /**
+     * The communicator
+     */
     final Communicator communicator;
 
 
@@ -86,18 +103,46 @@ public class GameWindow {
      */
     public void startMenu() {
         loadScene(new MenuScene(this));
-    }public void startEnd(int score) {
+    }
+
+    /**
+     * Show the End Screen
+     * @param score the score achieved by the user
+     */
+    public void startEnd(int score) {
         loadScene(new EndScene(this, score));
     }
+
+    /**
+     * Show the score screen
+     * @param score the score achieved by the user
+     */
     public void startScore(int score) {
         loadScene(new ScoreScene(this, score));
     }
+
+    /**
+     * Show the game lobby
+     * @param channel the name of the game
+     * @param hosting am I the host?
+     * @param name what is my name?
+     * @param users the list of users connected to the game?
+     * @param communicator I need some way to talk to the server
+     */
     public void startGameLobby(String channel, boolean hosting, String name, String[] users, Communicator communicator) {
         loadScene(new GameLobbyScene(this, channel, hosting, name, users, communicator));
     }
+
+    /**
+     * Start the score screen without a score (for viewing purposes)
+     */
     public void startScore() {
         loadScene(new ScoreScene(this));
     }
+
+    /**
+     * Show the main lobby to check for available multiplayer games
+     */
     public void startLobby() {
         loadScene(new LobbyScene(this));
     }
@@ -108,6 +153,10 @@ public class GameWindow {
     public void startChallenge() {
         loadScene(new ChallengeScene(this));
     }
+
+    /**
+     * Show the instructions screen
+     */
     public void showInstructions() { loadScene(new InstructionsScene(this)); }
 
     /**

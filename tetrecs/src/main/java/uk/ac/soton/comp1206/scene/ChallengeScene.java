@@ -13,30 +13,46 @@ import uk.ac.soton.comp1206.component.GameBlock;
 import uk.ac.soton.comp1206.component.GameBoard;
 import uk.ac.soton.comp1206.component.PieceBoard;
 import uk.ac.soton.comp1206.component.SideBar;
-import uk.ac.soton.comp1206.event.GameOverListener;
 import uk.ac.soton.comp1206.event.PieceSpawnedListener;
 import uk.ac.soton.comp1206.game.Game;
 import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
-import uk.ac.soton.comp1206.utilities.FileHandler;
 import uk.ac.soton.comp1206.utilities.Multimedia;
 
-import java.util.function.Consumer;
 
 /**
  * The Single Player challenge scene. Holds the UI for the single player challenge mode in the game.
  */
 public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
-
+    /**
+     * Loggers are always important
+     */
     private static final Logger logger = LogManager.getLogger(ChallengeScene.class);
-    private GameOverListener gameOverListener;
+    /**
+     * The board showing the current piece in play
+     */
     private PieceBoard pieceBoard;
+    /**
+     * The board showing the next piece in play
+     */
     private PieceBoard nextpieceBoard;
+    /**
+     * The board showing the current game
+     */
     private GameBoard board;
+    /**
+     * The sidebar showing various stats and useful info
+     */
     private SideBar sidePane;
-    public int topScore;
+    /**
+     * The media object
+     * The thing that plays the music
+     */
     Multimedia media;
+    /**
+     * The game
+     */
     protected Game game;
 
     /**
@@ -94,34 +110,58 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         game.setOnGameLoop(this::gameLooped);
         game.scoreProperty().addListener(this::checkLevelUp);
 
-        game.setOnGameOver(this::checkGameOver);
+        game.setOnGameOver(() -> Platform.runLater(() -> gameOver()));
 
 
 
     }
 
+    /**
+     * Check whether the user has leveled up
+     * @param observable the trigger event (Score being updated)
+     */
     private void checkLevelUp(Observable observable) {
         if (game.scoreProperty().getValue()/1000 > game.levelProperty().getValue()) {
             game.levelProperty().setValue(game.scoreProperty().getValue()/1000 );
         }
-    }private void checkGameOver() {
-        Platform.runLater(this::gameOver);
     }
+
+    /**
+     * Finishes the game
+     */
     public void gameOver() {
         Multimedia.playAudio("fail.wav");
-        gameWindow.startScore(game.scoreProperty().getValue());
+        media.stop();
+        gameWindow.startEnd(game.scoreProperty().getValue());
 
     }
+
+    /**
+     * Updates the timer on the sidepane each time the game is looped
+     * @param time the amount of time the timer needs to represent
+     */
     private void gameLooped(int time){
         logger.info("Setting timer " + time);
         sidePane.setTimer(time);
     }
+
+    /**
+     * Get the currently targeted block and set the target in the game
+     * @param event the trigger mouse hover event
+     * @param gameBlock the gameblock that was hovered over
+     */
     private void blockHovered(MouseEvent event, GameBlock gameBlock) {
         board.resetBoard();
         game.setAim(gameBlock.getX(), gameBlock.getY());
         board.target(game.getX(),game.getY());
 
     }
+
+    /**
+     * Conveys block clicked information to the game
+     * @param event the click event
+     * @param gameBlock the block that was clicked
+     */
     private void blockClicked(MouseEvent event, GameBlock gameBlock) {
         logger.info(gameBlock.getGameBoard().equals(board));
         if (event.getButton() == MouseButton.PRIMARY) {
@@ -131,21 +171,46 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
 
         }
 
-    }private void rotatePiece(MouseEvent event, GameBlock gameBlock) {
+    }
+
+    /**
+     * Triggers the rotation of the piece on a board
+     * @param event the trigger click event
+     * @param gameBlock the block that was clicked
+     */
+    private void rotatePiece(MouseEvent event, GameBlock gameBlock) {
         Multimedia.playAudio("rotate.wav");
         game.rotateCurrentPiece(1);
         board.resetBoard();
         board.target(game.getX(),game.getY());
-    }private void swapPiece(MouseEvent event, GameBlock gameBlock) {
+    }
+
+    /**
+     * Triggers the swapping of the current and the next piece
+     * @param event the trigger click event
+     * @param gameBlock the block that was clicked
+     */
+    private void swapPiece(MouseEvent event, GameBlock gameBlock) {
         Multimedia.playAudio("pling.wav");
         game.swapCurrentPiece();
     }
+
+    /**
+     * Triggers when a piece is spawned sending that information to the various boards
+     * @param nextGamePiece the current game piece
+     * @param followingGamePiece the next game piece
+     */
     public void pieceSpawned(GamePiece nextGamePiece, GamePiece followingGamePiece) {
         pieceBoard.displayPiece(nextGamePiece);
         nextpieceBoard.displayPiece(followingGamePiece);
         board.setNextPiece(nextGamePiece);
 
     }
+
+    /**
+     * Triggers the fadeout effect of any blocks which were destroyed
+     * @param coords
+     */
     public void piecesDestroyed(int[][] coords){
         board.fadeOut(coords);
     }
@@ -158,11 +223,21 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         //Start new game
         game = new Game(5, 5);
     }
+
+    /**
+     * Change where the gameblock is being aimed towards
+     * @param x the change in column info
+     * @param y the change in row info
+     */
     public void moveAim(int x, int y){
         board.resetBoard();
-        game.setAim(game.getX()+x, game.getY()+y);
+        game.setAim(Math.min(Math.max(game.getX()+x, 0), game.getCols()-1), Math.min(Math.max(game.getY()+y, 0), game.getRows()-1));
         board.target(game.getX(),game.getY());
     }
+
+    /**
+     * Exit the game
+     */
     private void exit(){
         media.stop();
         game.endTimer();

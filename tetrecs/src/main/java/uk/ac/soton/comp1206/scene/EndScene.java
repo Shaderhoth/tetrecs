@@ -18,11 +18,21 @@ import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.utilities.Multimedia;
 
-
+/**
+ * The End Scene which appears when the game is over
+ */
 public class EndScene extends BaseScene {
-
+    /**
+     * I'm struggling to find new was of saying that the logger makes logs or is extremely useful
+     */
     private static final Logger logger = LogManager.getLogger(EndScene.class);
+    /**
+     * The Score the user managed to achieve in their game
+     */
     private final int score;
+    /**
+     * A very useful media player
+     */
     private Multimedia media;
     /**
      * Create a new menu scene
@@ -41,7 +51,7 @@ public class EndScene extends BaseScene {
     public void build() {
         logger.info("Building " + this.getClass().getName());
 
-
+        media = new Multimedia("end.wav");
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         var endPane = new StackPane();
@@ -60,7 +70,16 @@ public class EndScene extends BaseScene {
         text.getStyleClass().add("title");
         mainPane.getChildren().add(text);
         mainPane.setAlignment(Pos.CENTER);
-        root.setOnMouseClicked((e) -> gameWindow.startMenu());
+        root.setOnMouseClicked((e) -> exit());
+
+    }
+
+    /**
+     * End the end
+     */
+    private void exit(){
+        media.stop();
+        gameWindow.startScore(score);
 
     }
 
@@ -75,7 +94,7 @@ public class EndScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
-                    case ESCAPE:    gameWindow.startMenu(); break;
+                    default:    exit(); break;
                 }
             }
         });

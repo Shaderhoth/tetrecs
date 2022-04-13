@@ -28,21 +28,57 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+/**
+ * A lobby containing a list of all available multiplayer games
+ */
 public class LobbyScene extends BaseScene {
-
+    /**
+     * Logging is cool
+     */
     private static final Logger logger = LogManager.getLogger(LobbyScene.class);
+    /**
+     * A tool to talk to the server which for some reason requires you to connect to a vpn
+     */
     private static final Communicator communicator = new Communicator("ws://ofb-labs.soton.ac.uk:9700");
+    /**
+     * A media player tool
+     */
     private Multimedia media;
+    /**
+     * A timer to ping the server for available games
+     */
     private Timer timer;
+    /**
+     * The process being executed by the timer
+     */
     private TimerTask task;
+    /**
+     * A pane to store the list of available games
+     */
     private VBox channelPane;
+    /**
+     * The main pane
+     */
     private StackPane lobbyPane;
+    /**
+     * The channel you are connecting to
+     */
     private String channel = null;
+    /**
+     * whether you are the host of the game
+     */
     private boolean hosting = false;
+    /**
+     * The nickname you are assigned by the server
+     */
     private String name = null;
+    /**
+     * A list of users connected to the game
+     */
     private String[] users = null;
-
+    /**
+     * The delay before each successive request of active games
+     */
     private long delay = 10000;
     /**
      * Create a new menu scene
@@ -53,6 +89,9 @@ public class LobbyScene extends BaseScene {
         logger.info("Creating Lobby Scene");
     }
 
+    /**
+     * A thread which requests a list of available games from the server every {delay} milliseconds
+     */
     private void requestChannels(){
 
         if (timer != null) {
@@ -67,6 +106,11 @@ public class LobbyScene extends BaseScene {
         };
         timer.scheduleAtFixedRate(task, 0, delay);
     }
+
+    /**
+     * A script which executes whenever you receive data from the server
+     * @param message the data received
+     */
     private void receiveMessage(String message){
         if (message.startsWith("CHANNELS ")){
             channelPane.getChildren().removeAll(channelPane.getChildren());
@@ -93,6 +137,11 @@ public class LobbyScene extends BaseScene {
             alert(message);
         }
     }
+
+    /**
+     * Creates a channel to represent a game to join
+     * @param event
+     */
     private void createChannel(MouseEvent event) {
         TextField getChannelName = new TextField("");
         Prompt prompt = new Prompt("Create Channel", getChannelName, gameWindow.getWidth());
@@ -103,6 +152,11 @@ public class LobbyScene extends BaseScene {
         });
 
     }
+
+    /**
+     * Creates an alert window if an error occurs
+     * @param message
+     */
     private void alert(String message) {
 
         Text promptText = new Text(message);
@@ -168,6 +222,10 @@ public class LobbyScene extends BaseScene {
 
 
     }
+
+    /**
+     * Exits the lobby
+     */
     public void exit() {
         communicator.send("QUIT");
         gameWindow.startMenu();

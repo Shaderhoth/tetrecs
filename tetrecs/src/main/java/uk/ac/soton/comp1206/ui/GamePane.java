@@ -21,11 +21,21 @@ import org.apache.logging.log4j.Logger;
  */
 public class GamePane extends StackPane {
 
-    private static final Logger logger = LogManager.getLogger(GamePane.class);
-
+    /**
+     * The width of the Pane
+     */
     private final int width;
+    /**
+     * The height of the pane
+     */
     private final int height;
+    /**
+     * The aspect being used to scale the screen (either width or height)
+     */
     private double scalar = 1;
+    /**
+     * Specifies whether the screen auto-scales
+     */
     private final boolean autoScale = true;
 
     /**

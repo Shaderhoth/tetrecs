@@ -26,19 +26,45 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Heavily inspired by the UserList from ECS Chat
+ * Basically the SideBar but with different information, and with the only common aspects being that they are both bars
+ * on the side of the screen that can shrink into the side
+ */
 public class UserList extends VBox {
-
-    private static final Logger logger = LogManager.getLogger(UserList.class);
+    /**
+     * A pane containing the collection of users
+     */
     private VBox users;
+    /**
+     * A scrollable pane
+     */
     private ScrollPane scroller;
+    /**
+     * An input box containing the name of the user
+     */
     private TextField username;
-    private CheckBox mute;
+    /**
+     * A start button which only appears if you are host
+     * Starts the game
+     */
     private HBox startButton;
+    /**
+     * A list of the users in the game lobby
+     */
     private SimpleListProperty<String> usersList = new SimpleListProperty();
-
+    /**
+     * The width of the sidebar
+     */
     private final int width = 256;
+    /**
+     * Is the sidebar visible?
+     */
     private boolean visible;
 
+    /**
+     * Initialise the list
+     */
     public UserList(){
         setPrefWidth(width);
         setSpacing(16);
@@ -49,37 +75,39 @@ public class UserList extends VBox {
         build();
     }
 
+    /**
+     * Build the layout
+     */
     public void build() {
         var image = new ImageView(new Image(this.getClass().getResource("/images/ECS.png").toExternalForm()));
         image.setPreserveRatio(true);
         image.setFitWidth(64);
         getChildren().add(image);
 
-        //Add modifiable username field
+        //Add a username field
         username = new TextField();
         getChildren().add(username);
 
-        //Add userList
+        //Add the list of users
         users = new VBox();
         users.setSpacing(16);
         users.setPadding(new Insets(8,8,8,8));
 
-        //Add scrollpane
+        //make users scrollable
         scroller = new ScrollPane();
         scroller.setContent(users);
         scroller.setFitToWidth(true);
         scroller.getStyleClass().add("userlist-pane");
 
-        //Add mutebox
-        mute = new CheckBox("Notifications");
-        mute.getStyleClass().add("checkbox");
-        mute.selectedProperty().bindBidirectional(Multimedia.getAudioEnabled());
-        getChildren().add(mute);
-
         getChildren().add(users);
         image.setOnMouseClicked((e) -> toggleSidebar());
         usersList.addListener(this::updateUsers);
     }
+
+    /**
+     * Make a start button
+     * @return the start button object
+     */
     public HBox addStartButton(){
         if (startButton == (null)) {
             startButton = new HBox();
@@ -95,6 +123,10 @@ public class UserList extends VBox {
 
     }
 
+    /**
+     * Update the list of users
+     * @param change the listener which triggers the method
+     */
     private void updateUsers(ListChangeListener.Change<? extends String> change) {
         users.getChildren().removeAll(users.getChildren());
         for (String user: usersList) {
@@ -104,11 +136,26 @@ public class UserList extends VBox {
         }
     }
 
+    /**
+     * gets the username field
+     * @return the username
+     */
     public TextField getUsernameField() {
         return username;
-    }public SimpleListProperty<String> getUsers() {
+    }
+
+    /**
+     * Gets a list of the users
+     * @return the list of users
+     */
+    public SimpleListProperty<String> getUsers() {
         return usersList;
     }
+
+    /**
+     * Add a user to the users pane
+     * @param username the name of the user
+     */
     public void addUser(String username){
         var userBox = new HBox();
         userBox.getStyleClass().add("user");
@@ -125,6 +172,9 @@ public class UserList extends VBox {
         users.getChildren().add(userBox);
     }
 
+    /**
+     * Toggle the visibility of the sidebar
+     */
     private void toggleSidebar() {
         if(visible) {
             visible = false;

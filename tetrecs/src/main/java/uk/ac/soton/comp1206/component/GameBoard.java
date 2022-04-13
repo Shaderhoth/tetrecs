@@ -59,10 +59,27 @@ public class GameBoard extends GridPane {
      * The listener to call when a specific block is clicked
      */
     private BlockClickedListener blockClickedListener;
+
+    /**
+     * The listener to call when a specific block is hovered over
+     */
     private BlockHoveredListener blockHoveredListener;
 
+
+
+    /**
+     * The next piece in play
+     */
     private GamePiece nextPiece;
+
+
+    /**
+     * index of the row currently being targeted
+     */
     private int x = 1;
+    /**
+     * index of the column currently being targeted
+     */
     private int y = 1;
 
 
@@ -182,6 +199,12 @@ public class GameBoard extends GridPane {
 
         }
     }
+
+    /**
+     * Sets the listener to check whether a block is being hovered over
+     * @param listener the Block Hovered Listener
+     * @see BlockHoveredListener
+     */
     public void setOnBlockHover(BlockHoveredListener listener) {
         this.blockHoveredListener = listener;
     }
@@ -197,6 +220,10 @@ public class GameBoard extends GridPane {
 
         }
     }
+
+    /**
+     * Resets the board
+     */
     public void resetBoard(){
         for(var y = 0; y < rows; y++) {
             for (var x = 0; x < cols; x++) {
@@ -205,6 +232,12 @@ public class GameBoard extends GridPane {
         }
 
     }
+
+    /**
+     * Targets a location and highlights the location of the current piece in play
+     * @param x the row index of the targeted location
+     * @param y the column index of the targeted location
+     */
     public void target(int x, int y){
         this.x = x;
         this.y = y;
@@ -224,12 +257,22 @@ public class GameBoard extends GridPane {
             }
         }
     }
+
+    /**
+     * Updates the current piece in play and resets the board
+     * @param p
+     */
     public void setNextPiece(GamePiece p){
         nextPiece = p;
         resetBoard();
         logger.info("Reset board");
         target(x,y);
     }
+
+    /**
+     * Triggers the fadeout animation of every piece which has been destroyed
+     * @param coords a collection of coordinates of destroyed pieces
+     */
     public void fadeOut(int[][] coords){
         AnimationTimer timer = new AnimationTimer(){
             int speed = 5;

@@ -19,8 +19,16 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
  * The main menu of the game. Provides a gateway to the rest of the game.
  */
 public class MenuScene extends BaseScene {
-
+    /**
+     * Logs are cool
+     * Logs are fun
+     * Its 6 am
+     * I need to sleep
+     */
     private static final Logger logger = LogManager.getLogger(MenuScene.class);
+    /**
+     * It plays music
+     */
     private Multimedia media;
     /**
      * Create a new menu scene
@@ -68,6 +76,12 @@ public class MenuScene extends BaseScene {
         options.setAlignment(Pos.CENTER_RIGHT);
 
     }
+
+    /**
+     * Makes a button
+     * @param name the name of the button
+     * @return the button what was created
+     */
     private HBox createButton(String name){
         //For now, let us just add a button that starts the game. I'm sure you'll do something way better.
         var button = new MenuOption(name);
@@ -123,11 +137,29 @@ public class MenuScene extends BaseScene {
     private void startGame(MouseEvent event) {
         media.stop();
         gameWindow.startChallenge();
-    }private void showInstructions(MouseEvent event) {
+    }
+
+    /**
+     * Handle when the showInstructions button is pressed
+     * @param event the click event on the showInstructions button
+     */
+    private void showInstructions(MouseEvent event) {
         gameWindow.showInstructions();
-    }private void showScores(MouseEvent event) {
+    }
+
+    /**
+     * Handle when the showScores button is pressed
+     * @param event the click event on the showScores button
+     */
+    private void showScores(MouseEvent event) {
         gameWindow.startScore();
-    }private void startLobby(MouseEvent event) {
+    }
+
+    /**
+     * Handle when the startLobby button is pressed
+     * @param event the click event on the startLobby button
+     */
+    private void startLobby(MouseEvent event) {
         gameWindow.startLobby();
     }
 

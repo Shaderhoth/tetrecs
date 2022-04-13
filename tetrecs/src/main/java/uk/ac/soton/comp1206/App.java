@@ -21,9 +21,17 @@ public class App extends Application {
      * Base resolution height
      */
     private final int height = 600;
-
+    /**
+     * The application
+     */
     private static App instance;
+    /**
+     * Another logger
+     */
     private static final Logger logger = LogManager.getLogger(App.class);
+    /**
+     * The Stage of the application
+     */
     private Stage stage;
 
     /**

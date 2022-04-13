@@ -21,10 +21,17 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
 
 import java.util.Random;
 
-
+/**
+ * The Scene containing all the instructions and a preview of the blocks
+ */
 public class InstructionsScene extends BaseScene {
-
+    /**
+     * An extremely useful debugging tool
+     */
     private static final Logger logger = LogManager.getLogger(InstructionsScene.class);
+    /**
+     * A media player which isnt being used currently
+     */
     private Multimedia media;
     /**
      * Create a new menu scene
@@ -36,7 +43,7 @@ public class InstructionsScene extends BaseScene {
     }
 
     /**
-     * Build the menu layout
+     * Build the scene layout
      */
     @Override
     public void build() {
@@ -84,7 +91,7 @@ public class InstructionsScene extends BaseScene {
 
 
     /**
-     * Initialise the menu
+     * Initialise the scene
      */
     @Override
     public void initialise() {

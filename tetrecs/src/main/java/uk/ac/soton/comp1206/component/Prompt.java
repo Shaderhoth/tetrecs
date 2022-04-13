@@ -11,9 +11,21 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import uk.ac.soton.comp1206.event.PromptExitListener;
 
+/**
+ * A popup alert/prompt triggered when data needs to be entered or an issue occurs
+ */
 public class Prompt extends VBox{
+    /**
+     * A listener to check when the prompt is closed
+     */
     private PromptExitListener promptExitListener;
 
+    /**
+     * Initialised the prompt object
+     * @param title the title of the prompt
+     * @param node the data on the prompt (can be entry or just text or even an image... probably)
+     * @param width the width of the prompt
+     */
     public Prompt(String title, Node node, double width){
         Text promptTitle = new Text(title);
         promptTitle.getStyleClass().add("title");
@@ -41,19 +53,38 @@ public class Prompt extends VBox{
         setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Activates when a key is released (typed but with less steps)
+     * @param keyEvent the key event causing the method to trigger (the key the user typed/released)
+     */
     private void alertKeyRelease(KeyEvent keyEvent) {
         if (keyEvent.getCode().equals(KeyCode.ENTER) || keyEvent.getCode().equals(KeyCode.ESCAPE)){
             onExit();
         }
     }
+
+    /**
+     * Activates when the user confirms the alert
+     * @param mouseEvent the mouse click event causing the method to trigger
+     */
     private void alertConfirmed(MouseEvent mouseEvent) {
         onExit();
     }
+
+    /**
+     * Defines a listener to activate when the prompt is exited
+     * @param promptExitListener
+     */
     public void setOnExit(PromptExitListener promptExitListener){
         this.promptExitListener = promptExitListener;
     }
 
+    /**
+     * Triggers the listener
+     */
     public void onExit() {
-        promptExitListener.onExit();
+        if (promptExitListener != null) {
+            promptExitListener.onExit();
+        }
     }
 }

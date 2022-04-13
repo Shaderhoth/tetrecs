@@ -34,22 +34,56 @@ import java.util.List;
 import java.util.Stack;
 
 /**
- * Chat window which will display chat messages and a way to send new messages
+ * Game Lobby including chat window and user list
  */
 public class GameLobbyScene extends BaseScene{
-
+    /**
+     * Its like a woodcutter except totally different
+     */
     private static final Logger logger = LogManager.getLogger(GameLobbyScene.class);
+    /**
+     * Necessary for communication with the server
+     */
     private Communicator communicator;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+    /**
+     * The chat window where all the user messages are contained
+     */
     private TextFlow messages;
+    /**
+     * The message entry box
+     */
     private TextField messageToSend;
+    /**
+     * A scrollable pane to store the endless number of users connected to your lobby
+     */
     private ScrollPane scroller;
+    /**
+     * The Side Pane
+     */
     private UserList userList;
+    /**
+     * The main pain for your lobby
+     */
     private BorderPane lobbyPane;
+    /**
+     * encapsulates the main pain so I can overlay the prompt
+     */
     private StackPane basePane;
+    /**
+     * The list of users connected to your lobby
+     */
     private SimpleListProperty<String> users;
+    /**
+     * Do I jump to the bottom?
+     */
     private boolean scrollToBottom = false;
+    /**
+     * Am I the host
+     */
     private boolean host = false;
+    /**
+     * What is my username?
+     */
     private SimpleStringProperty username = new SimpleStringProperty("");
 
 
@@ -153,12 +187,22 @@ public class GameLobbyScene extends BaseScene{
 
     }
 
+    /**
+     * Triggers whenever the username is updated
+     * @param observableValue the trigger event
+     * @param s the oldname
+     * @param s1 the new name
+     */
     private void updateName(ObservableValue<? extends String> observableValue, String s, String s1) {
         if (!s.equals(s1)) {
             communicator.send("NICK " + s1);
         }
     }
 
+    /**
+     * Add a user to the users list
+     * @param message the received message
+     */
     private void addUsers(String message){
         for (String user:message.substring(6).split("\n")) {
             if (!users.contains(user)){
@@ -167,6 +211,10 @@ public class GameLobbyScene extends BaseScene{
         }
     }
 
+    /**
+     * Triggers when someone updates their name
+     * @param message the context including their old and new names
+     */
     private void rename(String message){
         if(message.contains((":"))){
             var components = message.substring(5).split(":", 2);
@@ -200,6 +248,11 @@ public class GameLobbyScene extends BaseScene{
             alert(message);
         }
     }
+
+    /**
+     * Trigger a user prompt
+     * @param message the alert message
+     */
     private void alert(String message) {
 
         Text promptText = new Text(message);
@@ -219,7 +272,10 @@ public class GameLobbyScene extends BaseScene{
         scrollToBottom = false;
     }
 
-
+    /**
+     * Add a received message to the messages TextFlow
+     * @param message the message to be added
+     */
     public void addMessage(String message) {
 
         var components = message.substring(4).split(":", 2);
@@ -253,10 +309,18 @@ public class GameLobbyScene extends BaseScene{
         //Clear the text input box
         messageToSend.clear();
     }
+
+    /**
+     * Leave the game lobby and go back to the main waiting room
+     */
     public void exit() {
         communicator.send("PART");
         gameWindow.startLobby();
     }
+
+    /**
+     * Start the scene
+     */
     @Override
     public void initialise() {
 

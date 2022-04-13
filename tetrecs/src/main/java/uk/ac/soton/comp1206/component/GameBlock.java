@@ -46,9 +46,19 @@ public class GameBlock extends Canvas {
             Color.PURPLE
     };
 
+    /**
+     * The linked game board
+     * @see GameBoard
+     */
     private final GameBoard gameBoard;
 
+    /**
+     * the width of the game block
+     */
     private double width;
+    /**
+     * the height of the game block
+     */
     private double height;
 
     /**
@@ -91,6 +101,12 @@ public class GameBlock extends Canvas {
         //When the value property is updated, call the internal updateValue method
         value.addListener(this::updateValue);
     }
+
+    /**
+     * Gets the gameboard which this block is connected to
+     * @return the Game Board
+     * @see GameBoard
+     */
     public GameBoard getGameBoard(){
         return gameBoard;
     }
@@ -112,6 +128,10 @@ public class GameBlock extends Canvas {
         currentlyCovered = 0;
         paint();
     }
+
+    /**
+     * decides how to paint the canvas
+     */
     public void paint() {
         //If the block is empty, paint as empty
         if(value.get() == 0) {
@@ -123,7 +143,8 @@ public class GameBlock extends Canvas {
     }
 
     /**
-     * Paint this canvas empty
+     * Triggers an animation causing the game-block to fade out
+     * @param tempColour the colour of the block at the time of destruction
      */
     public void fadeOut(int tempColour){
         AnimationTimer timer = new AnimationTimer(){
@@ -165,6 +186,10 @@ public class GameBlock extends Canvas {
         timer.start();
 
     }
+
+    /**
+     * Paint this canvas empty
+     */
     private void paintEmpty() {
         var gc = getGraphicsContext2D();
 
@@ -229,13 +254,19 @@ public class GameBlock extends Canvas {
         gc.setFill(Color.rgb(0,0,0,0.5));
         gc.fillOval(0,0,width, height);
     }
+
+
+    /**
+     * Get the row of this block
+     * @return row number
+     */
     public int getX() {
         return x;
     }
 
     /**
-     * Get the row of this block
-     * @return row number
+     * gets the column of the current block
+     * @return column number
      */
     public int getY() {
         return y;
@@ -256,7 +287,11 @@ public class GameBlock extends Canvas {
     public void bind(ObservableValue<? extends Number> input) {
         value.bind(input);
     }
-    // Resize based on scale factor
+
+    /**
+     * Resize the game block
+     * @param factor the scale factor by which the gameblock is resized
+     */
     public void rs(double factor){
         var gc = getGraphicsContext2D();
         //Clear
@@ -267,6 +302,11 @@ public class GameBlock extends Canvas {
         setHeight(height);
         paint();
     }
+
+    /**
+     * Paints over the current block to show if the piece in play is currently targeting this location
+     * @param gp the colour of the current game piece
+     */
     public void paintOver(int gp) {
         currentlyCovered = gp;
         Color colour = COLOURS[gp];
@@ -304,7 +344,14 @@ public class GameBlock extends Canvas {
         //Border
         gc.setStroke(Color.WHITE);
         gc.strokeRect(0,0,width,height);
-    }public void paintFade(int gp, float percent) {
+    }
+
+    /**
+     * Paints the block with a percentage of colour for use when fading out
+     * @param gp the colour of the game piece
+     * @param percent the percentage of colour
+     */
+    public void paintFade(int gp, float percent) {
         Color colour = COLOURS[gp];
         var gc = getGraphicsContext2D();
         String c = String.valueOf(colour);

@@ -18,19 +18,54 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Timer;
 
+/**
+ * A sidepane to store all the useful information while playing a game
+ */
 public class SideBar extends VBox {
+    /**
+     * Logger for debug purposes
+     */
     private static final Logger logger = LogManager.getLogger(SideBar.class);
+    /**
+     * The current score of the user
+     */
     private Text score;
+    /**
+     * The local top score
+     */
     private Text topScore;
+    /**
+     * The current level of the user
+     */
     private Text level;
+    /**
+     * The number of lives remaining
+     */
     private Text lives;
+    /**
+     * The current multiplier
+     */
     private Text multiplier;
+    /**
+     * The Animated Timer object
+     */
     private UITimer timer;
-    private CheckBox mute;
+    /**
+     * An image box containing an image
+     */
     private HBox imgBox = new HBox();
+    /**
+     * The width of the sidebar
+     */
     private final int width = 256;
+    /**
+     * Is the sidebar visible?
+     */
     private boolean visible = true;
 
+    /**
+     * Initialise the sidebar
+     */
     public SideBar(){
         //set prefs
         setPrefWidth(width);
@@ -42,6 +77,9 @@ public class SideBar extends VBox {
         build();
     }
 
+    /**
+     * Build the sidebar
+     */
     public void build() {
 
         imgBox = new SideBarLabel();
@@ -77,9 +115,19 @@ public class SideBar extends VBox {
         */
         imgBox.setOnMouseClicked((e) -> toggleSidebar());
     }
+
+    /**
+     * Create an animated timer
+     * @param time the amount of time for the timer to count down
+     */
     public void setTimer(int time){
         timer.resetTimer(time);
     }
+
+    /**
+     * Add a label to the sidebar
+     * @return the Text object of the label
+     */
     private Text addLabel(){
         Text text = new Text();
         text.setFont(Font.font("style/Orbitron-Black.ttf", FontWeight.BOLD, FontPosture.REGULAR, 25));
@@ -88,22 +136,60 @@ public class SideBar extends VBox {
         text.setStrokeWidth(1);
         return text;
     }
+
+    /**
+     * Create a box containing data and add it to the sidebar
+     * @param text the text object containing the value of the data
+     * @param name the name of the data
+     */
     private void addBox(Text text, String name){
         var box = new SideBarLabel(text, name);
         getChildren().add(box);
     }
 
+    /**
+     * A method to get the ScoreField
+     * @return the Score
+     */
     public Text getScoreField() {
         return score;
-    }public Text getTopScoreField() {
+    }
+
+    /**
+     * A method to get the TopScoreField
+     * @return the TopScore
+     */
+    public Text getTopScoreField() {
         return topScore;
-    }public Text getLevelField() {
+    }
+
+    /**
+     * A method to get the LevelField
+     * @return the Level
+     */
+    public Text getLevelField() {
         return level;
-    }public Text getLivesField() {
+    }
+
+    /**
+     * A method to get the LivesField
+     * @return the Lives
+     */
+    public Text getLivesField() {
         return lives;
-    }public Text getMultiplierField() {
+    }
+
+    /**
+     * A method to get the MultiplierField
+     * @return the Multiplier
+     */
+    public Text getMultiplierField() {
         return multiplier;
     }
+
+    /**
+     * Toggles the visibility of the sidebar either shrinking it and its components or enlarging them
+     */
     private void toggleSidebar() {
         logger.info("Toggle Visibility, Currently visible: " + visible);
         if(visible) {
