@@ -94,6 +94,8 @@ public class MenuScene extends BaseScene {
             button.setOnMouseClicked(this::showInstructions);
         }else if (name.equals("SCORES")) {
             button.setOnMouseClicked(this::showScores);
+        }else if (name.equals("MULTI PLAYER")) {
+            button.setOnMouseClicked(this::startLobby);
         }
 
         return button;
@@ -125,6 +127,8 @@ public class MenuScene extends BaseScene {
         gameWindow.showInstructions();
     }private void showScores(MouseEvent event) {
         gameWindow.startScore();
+    }private void startLobby(MouseEvent event) {
+        gameWindow.startLobby();
     }
 
 }

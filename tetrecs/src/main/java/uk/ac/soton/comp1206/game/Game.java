@@ -76,9 +76,7 @@ public class Game {
 
     }
     private void resetTimer(){
-        if (timer != null) {
-            timer.cancel();
-        }
+        endTimer();
         if (gameLoopListener != null) {
             gameLoopListener.gameLoop(getTimerDelay());
         }

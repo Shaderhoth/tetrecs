@@ -92,8 +92,14 @@ public class GameWindow {
     public void startScore(int score) {
         loadScene(new ScoreScene(this, score));
     }
+    public void startGameLobby(String channel, boolean hosting, String name, String[] users, Communicator communicator) {
+        loadScene(new GameLobbyScene(this, channel, hosting, name, users, communicator));
+    }
     public void startScore() {
         loadScene(new ScoreScene(this));
+    }
+    public void startLobby() {
+        loadScene(new LobbyScene(this));
     }
 
     /**

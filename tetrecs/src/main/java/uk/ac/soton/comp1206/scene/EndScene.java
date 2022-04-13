@@ -35,7 +35,7 @@ public class EndScene extends BaseScene {
     }
 
     /**
-     * Build the menu layout
+     * Build the scene layout
      */
     @Override
     public void build() {
@@ -66,7 +66,7 @@ public class EndScene extends BaseScene {
 
 
     /**
-     * Initialise the menu
+     * The start of the end
      */
     @Override
     public void initialise() {

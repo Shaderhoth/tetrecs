@@ -32,7 +32,7 @@ public class Multimedia {
         if (!audioEnabled.get()) return;
 
         String toPlay = Multimedia.class.getResource("/music/" + file).toExternalForm();
-        logger.info("Playing audio: " + toPlay);
+        logger.info("Playing music: " + toPlay);
         try {
             Media play = new Media(toPlay);
             mediaPlayer = new MediaPlayer(play);
@@ -44,9 +44,11 @@ public class Multimedia {
             e.printStackTrace();
             logger.error("Unable to play audio file, disabling audio");
         }
-    }public Multimedia() {
     }
     public void stop(){
         mediaPlayer.stop();
+    }
+    public static SimpleBooleanProperty getAudioEnabled(){
+        return audioEnabled;
     }
 }

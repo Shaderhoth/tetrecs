@@ -1,6 +1,10 @@
-one:1000000
-two:100000
-three:10000
-four:1000
+one:200
+two:200
+three:200
+four:200
 five:100
-six:10
+Player:10
+Player:10
+Player:10
+Player:10
+Player:10

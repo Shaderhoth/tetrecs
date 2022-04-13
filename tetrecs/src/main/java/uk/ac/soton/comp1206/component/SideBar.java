@@ -3,6 +3,7 @@ package uk.ac.soton.comp1206.component;
 import javafx.animation.*;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.CheckBox;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -110,9 +111,10 @@ public class SideBar extends VBox {
             for(var child : getChildren()) {
                 if(child instanceof SideBarLabel) {
                     ((SideBarLabel) child).toggleVisibility();
-                }
-                if(child instanceof PieceBoard) {
+                }else if(child instanceof PieceBoard ) {
                     ((PieceBoard) child).resize(0.5);
+                }else if(child instanceof UITimer) {
+                    ((UITimer) child).rs(0.5);
                 }
 
             }
@@ -132,9 +134,10 @@ public class SideBar extends VBox {
                 for(var child : getChildren()) {
                     if(child instanceof SideBarLabel) {
                         ((SideBarLabel) child).toggleVisibility();
-                    }
-                    if(child instanceof PieceBoard) {
+                    }else if(child instanceof PieceBoard) {
                         ((PieceBoard) child).resize(2);
+                    }else if(child instanceof UITimer) {
+                        ((UITimer) child).rs(2);
                     }
                 }
             });

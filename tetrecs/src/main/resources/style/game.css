@@ -60,7 +60,18 @@
     -fx-font-weight: 900;
     -fx-border-color: #00000000;
     -fx-stroke: blue;
+    -fx-stroke-width: 1;
     -fx-background-color: #00000000;
+}.titlealternate {
+    -fx-text-color: red;
+    -fx-fill: red;
+    -fx-font-family: 'Orbitron';
+    -fx-font-size: 32px;
+    -fx-font-weight: 900;
+    -fx-border-color: #00000000;
+    -fx-stroke: red;
+    -fx-stroke-width: 1;
+    -fx-background-color: #00000033;
 }
 
 .heading {
@@ -144,17 +155,35 @@
 .channelList {
 
 }
-
-.channelItem {
+.channelItemText {
     -fx-fill: white;
-    -fx-font-family: 'Orbitron';
     -fx-font-size: 16px;
     -fx-font-weight: 700;
-    -fx-border-color: black;
+    -fx-text-fill: white;
+    -fx-border-width: 2;
+    -fx-border-color: #990099;
+    -fx-font-family: 'Orbitron-Black';
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 2, 2);
+}
+.channelItem {
     -fx-stroke: black;
+    -fx-border-width: 2;
+    -fx-border-color: #990099;
+    -fx-background-color: #000000;
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 2, 2);
 }
 .channelItem.selected {
     -fx-fill: yellow;
+}
+.channelItemButton {
+    -fx-stroke: black;
+    -fx-border-width: 2;
+    -fx-border-color: #990099;
+    -fx-background-color: #000000;
+    -fx-effect: dropshadow(gaussian, black, 3, 1.0, 2, 2);
+}
+.channelItemButton:hover {
+    -fx-background-color: #003333;
 }
 
 .leaderboard {
@@ -180,6 +209,18 @@
     -fx-background-color: transparent;
     -fx-font-size: 12px;
     -fx-font-family: 'Orbitron';
+    -fx-fill: white;
+}
+.messagePane {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+    -fx-font-family: 'Orbitron';
+    -fx-fill: white;
+}.messagePane .viewport{
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
+    -fx-font-family: 'Orbitron';
+    -fx-fill: white;
 }
 
 .messages Text {
