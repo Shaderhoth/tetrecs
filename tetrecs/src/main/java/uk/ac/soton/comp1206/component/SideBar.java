@@ -187,6 +187,8 @@ public class SideBar extends VBox {
         return multiplier;
     }
 
+
+
     /**
      * Toggles the visibility of the sidebar either shrinking it and its components or enlarging them
      */

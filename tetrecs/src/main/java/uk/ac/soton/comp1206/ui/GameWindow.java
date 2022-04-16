@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
+import uk.ac.soton.comp1206.component.UserList;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
 import uk.ac.soton.comp1206.utilities.Multimedia;
@@ -114,11 +115,29 @@ public class GameWindow {
     }
 
     /**
+     * Show the End Screen
+     * @param score the score achieved by the user
+     * @param scores a list of multiplayer scores
+     */
+    public void startEnd(int score, String scores, String name) {
+        loadScene(new EndScene(this, score, scores, name));
+    }
+
+    /**
      * Show the score screen
      * @param score the score achieved by the user
      */
-    public void startScore(int score) {
-        loadScene(new ScoreScene(this, score));
+    public void startScore(int score, String name) {
+        loadScene(new ScoreScene(this, score, name));
+    }
+
+    /**
+     * Show the score screen
+     * @param score the score achieved by the user
+     * @param scores a list of multiplayer scores
+     */
+    public void startMultiplayerScore(int score, String scores, String name) {
+        loadScene(new MultiplayerScoreScene(this, score, scores, name));
     }
 
     /**
@@ -129,7 +148,7 @@ public class GameWindow {
      * @param users the list of users connected to the game?
      * @param communicator I need some way to talk to the server
      */
-    public void startGameLobby(String channel, boolean hosting, String name, String[] users, Communicator communicator) {
+    public void startGameLobby(String channel, boolean hosting, String name, String users, Communicator communicator) {
         loadScene(new GameLobbyScene(this, channel, hosting, name, users, communicator));
     }
 
@@ -152,6 +171,13 @@ public class GameWindow {
      */
     public void startChallenge() {
         loadScene(new ChallengeScene(this));
+    }
+
+    /**
+     * Display the multiplayer challenge
+     */
+    public void startMultiplayer(Communicator communicator, UserList userList) {
+        loadScene(new MultiplayerScene(this, communicator, userList));
     }
 
     /**

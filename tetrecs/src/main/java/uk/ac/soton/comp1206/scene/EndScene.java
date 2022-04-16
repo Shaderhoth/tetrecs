@@ -31,6 +31,15 @@ public class EndScene extends BaseScene {
      */
     private final int score;
     /**
+     * A string containing all the scores of a multiplayer
+     */
+    private final String scores;
+    /**
+     * The name of the user
+     */
+    private final String name;
+
+    /**
      * A very useful media player
      */
     private Multimedia media;
@@ -41,6 +50,19 @@ public class EndScene extends BaseScene {
     public EndScene(GameWindow gameWindow, int score) {
         super(gameWindow);
         this.score = score;
+        scores = null;
+        name = "Player";
+        logger.info("Creating End Scene");
+    }
+    /**
+     * Create a new menu scene
+     * @param gameWindow the Game Window this will be displayed in
+     */
+    public EndScene(GameWindow gameWindow, int score, String scores, String name) {
+        super(gameWindow);
+        this.score = score;
+        this.scores = scores;
+        this.name = name;
         logger.info("Creating End Scene");
     }
 
@@ -79,8 +101,11 @@ public class EndScene extends BaseScene {
      */
     private void exit(){
         media.stop();
-        gameWindow.startScore(score);
-
+        if (scores != null){
+            gameWindow.startMultiplayerScore(score, scores, name);
+        }else {
+            gameWindow.startScore(score, name);
+        }
     }
 
 

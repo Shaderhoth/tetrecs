@@ -42,7 +42,7 @@ public class Game {
     /**
      * number of remaining lives
      */
-    private IntegerProperty lives = new SimpleIntegerProperty(3);
+    protected IntegerProperty lives = new SimpleIntegerProperty(3);
 
     /**
      * The current score multiplier
@@ -67,7 +67,7 @@ public class Game {
     /**
      *A listener to check for the game being over
      */
-    private GameOverListener gameOverListener;
+    protected GameOverListener gameOverListener;
 
     /**
      * The currently targeted X coordinate
@@ -82,7 +82,7 @@ public class Game {
     /**
      * A repeating thread executing the gameloop to encourage the user to act fast
      */
-    private Timer timer;
+    protected Timer timer;
 
     /**
      * The task being executed by the timer
@@ -102,12 +102,12 @@ public class Game {
     /**
      * The piece which is currently in play
      */
-    private GamePiece currentPiece;
+    protected GamePiece currentPiece;
 
     /**
      * The piece to be played after the current piece
      */
-    private GamePiece followingPiece;
+    protected GamePiece followingPiece;
     /**
      * The grid model linked to the game
      */
@@ -297,7 +297,7 @@ public class Game {
      * @return the newly created GamePiece
      * @see GamePiece
      */
-    public GamePiece spawnPiece(){
+    protected GamePiece spawnPiece(){
         GamePiece g = GamePiece.createPiece(new Random().nextInt(0,14));
 
         return g;
@@ -310,7 +310,7 @@ public class Game {
      * Updates the next piece
      * Updates the piece boards
      */
-    public void nextPiece(){
+    protected void nextPiece(){
         currentPiece = followingPiece;
         followingPiece  = spawnPiece();
         updatePieceBoards();
@@ -339,7 +339,7 @@ public class Game {
     /**
      * Update the piece boards using the pieceSpawned listener
      */
-    public void updatePieceBoards(){
+    protected void updatePieceBoards(){
         if (pieceSpawnedListener != null) {
             pieceSpawnedListener.pieceSpawned(currentPiece, followingPiece);
         }
@@ -388,7 +388,7 @@ public class Game {
      * @param lines the number of lines cleared this round
      * @param blocks the number of blocks cleared this round
      */
-    public void score(int lines, int blocks){
+    private void score(int lines, int blocks){
         score.setValue(score.getValue() + lines * blocks * 10 * multiplier.getValue());
         topScore.setValue(Math.max(score.getValue(), topScore.getValue()));
 
@@ -398,7 +398,7 @@ public class Game {
      * Calculates the number of blocks, rows and columns which have been cleared
      * Updates the pieces destroyed listener
      */
-    public void afterPiece(){
+    private void afterPiece(){
         ArrayList<Integer> columnsToClear = new ArrayList();
         List<Integer[]> coords = new ArrayList<Integer[]>();
         int lines = 0;
@@ -449,7 +449,8 @@ public class Game {
         if (piecesDestroyedListener != null && coords.size() > 0) {
             int[][] cs = new int[coords.size()][2];
             for (int i = 0; i < coords.size(); i++) {
-                cs[i] = new int[]{coords.get(i)[0], coords.get(i)[1]};
+                cs[i] = new int[]{coords.get(i)[0], coords.get(i)[1], grid.get(coords.get(i)[0],coords.get(i)[1])};
+                grid.set(coords.get(i)[0],coords.get(i)[1],0);
             }
             piecesDestroyedListener.piecesDestroyed(cs);
         }
@@ -509,7 +510,7 @@ public class Game {
      * The amount of time before the next piece is supposed to be placed
      * @return the amount of time
      */
-    public int getTimerDelay(){
+    private int getTimerDelay(){
         if (12000 - 500 * levelProperty().get() > 2500){
             return 12000 - 500 * levelProperty().get();
         }else {

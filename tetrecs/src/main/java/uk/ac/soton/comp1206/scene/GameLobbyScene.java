@@ -54,7 +54,11 @@ public class GameLobbyScene extends BaseScene{
      */
     private TextField messageToSend;
     /**
-     * A scrollable pane to store the endless number of users connected to your lobby
+     * The current message container
+     */
+    private HBox sendMessageBar;
+    /**
+     * A scrollable pane to store the messages
      */
     private ScrollPane scroller;
     /**
@@ -72,7 +76,7 @@ public class GameLobbyScene extends BaseScene{
     /**
      * The list of users connected to your lobby
      */
-    private SimpleListProperty<String> users;
+    private String users;
     /**
      * Do I jump to the bottom?
      */
@@ -95,15 +99,11 @@ public class GameLobbyScene extends BaseScene{
      * @param name the user's name
      * @param users the initial list of users
      */
-    public GameLobbyScene(GameWindow gameWindow,String channel,boolean hosting,String name,String[] users, Communicator communicator) {
+    public GameLobbyScene(GameWindow gameWindow,String channel,boolean hosting,String name,String users, Communicator communicator) {
         super(gameWindow);
         this.host = hosting;
         this.username.setValue(name);
-        ArrayList<String> tempList= new ArrayList<>();
-        for (String user:users) {
-            tempList.add(user);
-        }
-        this.users = new SimpleListProperty(FXCollections.observableArrayList(tempList));
+        this.users = users;
         this.communicator = communicator;
         logger.info("Creating Game Lobby Scene");
 
@@ -132,10 +132,10 @@ public class GameLobbyScene extends BaseScene{
 
         //Userlist pane on right
         userList = new UserList();
-        userList.getUsers().bindBidirectional(users);
         lobbyPane.setRight(userList);
         userList.getUsernameField().textProperty().bindBidirectional(username);
-        users.add(username.getName());
+        userList.addUsers(users);
+
         if (host){
             HBox startButton = userList.addStartButton();
             if (startButton != null){
@@ -153,7 +153,7 @@ public class GameLobbyScene extends BaseScene{
         messageToSend = new TextField();
         messageToSend.setPromptText("Enter message");
         Button sendMessage = new Button("Send");
-        HBox sendMessageBar = new HBox();
+        sendMessageBar = new HBox();
         sendMessageBar.getChildren().add(messageToSend);
         sendMessageBar.getChildren().add(sendMessage);
         HBox.setHgrow(messageToSend,Priority.ALWAYS);
@@ -177,6 +177,7 @@ public class GameLobbyScene extends BaseScene{
         //Make pressing enter on the text field send a message
         messageToSend.setOnKeyPressed((event) -> {
             if (event.getCode() != KeyCode.ENTER) return;
+            if (!messageToSend.isFocused()) return;
             sendCurrentMessage(messageToSend.getText());
         });
         username.addListener(this::updateName);
@@ -198,33 +199,6 @@ public class GameLobbyScene extends BaseScene{
             communicator.send("NICK " + s1);
         }
     }
-
-    /**
-     * Add a user to the users list
-     * @param message the received message
-     */
-    private void addUsers(String message){
-        for (String user:message.substring(6).split("\n")) {
-            if (!users.contains(user)){
-                users.add(user);
-            }
-        }
-    }
-
-    /**
-     * Triggers when someone updates their name
-     * @param message the context including their old and new names
-     */
-    private void rename(String message){
-        if(message.contains((":"))){
-            var components = message.substring(5).split(":", 2);
-            if (users.contains(components[0])){
-                users.set(users.indexOf(components[0]),components[1]);
-            }else{
-                users.add(components[1]);
-            }
-        }
-    }
     /**
      * Handle an incoming message from the Communicator
      * @param message The message that has been received, in the form User:Message
@@ -233,11 +207,14 @@ public class GameLobbyScene extends BaseScene{
         if (message.startsWith("MSG ")){
             addMessage(message);
         }else if (message.startsWith("USERS ")){
-            addUsers(message);
+            userList.addUsers(message);
         }else if (message.startsWith("NICK ")){
-            rename(message);
-        }else if (message.startsWith("START ")){
-
+//            rename(message);
+        }else if (message.startsWith("START")){
+            userList.setPlaying(scroller, messages, sendMessageBar, communicator);
+            gameWindow.startMultiplayer(communicator,userList);
+        }else if (message.startsWith("SCORES ")){
+            userList.addUsers(message);
         }else if (message.startsWith("HOST")){
             host = true;
             HBox startButton = userList.addStartButton();

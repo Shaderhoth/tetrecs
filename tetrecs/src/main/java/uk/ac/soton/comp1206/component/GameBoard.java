@@ -121,16 +121,6 @@ public class GameBoard extends GridPane {
     }
 
     /**
-     * Get a specific block from the GameBoard, specified by it's row and column
-     * @param x column
-     * @param y row
-     * @return game block at the given column and row
-     */
-    public GameBlock getBlock(int x, int y) {
-        return blocks[x][y];
-    }
-
-    /**
      * Build the GameBoard by creating a block at every x and y column and row
      */
     protected void build() {
@@ -290,8 +280,7 @@ public class GameBoard extends GridPane {
                 else if(now - lastTick > 1000000000 / speed){
                     lastTick = now ;
                     int[] coord = coords[i];
-                    blocks[coord[0]][coord[1]].fadeOut(blocks[coord[0]][coord[1]].getValue());
-                    grid.set(coord[0],coord[1],0);
+                    blocks[coord[0]][coord[1]].fadeOut(coord[2]);
                     i++;
                 }
 

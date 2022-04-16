@@ -5,21 +5,20 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.ScoresList;
-import uk.ac.soton.comp1206.event.CommunicationsListener;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
@@ -43,11 +42,7 @@ public class ScoreScene extends BaseScene {
     /**
      * The score you achieved
      */
-    private int score = 0;
-    /**
-     * The pane containing the list of scores
-     */
-    private VBox mainPane;
+    private Integer score;
     /**
      * The list of local scores
      */
@@ -59,15 +54,15 @@ public class ScoreScene extends BaseScene {
     /**
      * The pane containing the local scores
      */
-    private VBox localScorePane;
+    protected BorderPane localScorePane;
     /**
      * the pane containing the remote scores
      */
-    private VBox remoteScorePane;
+    protected BorderPane remoteScorePane;
     /**
      * The main pane
      */
-    private StackPane scorePane;
+    protected StackPane scorePane;
     /**
      * The media player
      */
@@ -79,7 +74,7 @@ public class ScoreScene extends BaseScene {
     /**
      * The name of the player
      */
-    private SimpleStringProperty name = new SimpleStringProperty("Player");
+    protected SimpleStringProperty name;
     /**
      * Toggle whether local or global scores are showing
      */
@@ -87,23 +82,24 @@ public class ScoreScene extends BaseScene {
     /**
      * the location of the local scores file
      */
-    private String fileName = "scores.txt";
+    protected String fileName = "scores.txt";
     /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
      * @param score the newly achieved score
      */
-    public ScoreScene(GameWindow gameWindow, int score) {
+    public ScoreScene(GameWindow gameWindow, int score, String name) {
         super(gameWindow);
         this.score = score;
-        logger.info("Creating End Scene");
+        this.name = new SimpleStringProperty(name);
+        logger.info("Creating Score Scene");
     }
     /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
      */public ScoreScene(GameWindow gameWindow) {
         super(gameWindow);
-        logger.info("Creating End Scene");
+        logger.info("Creating Score Scene");
     }
 
     /**
@@ -130,20 +126,20 @@ public class ScoreScene extends BaseScene {
     /**
      * Toggle which pane is showing
      */
-    private void toggleScreen(){
+    protected void toggleScreen(){
         if (localScorePane != null && remoteScorePane != null){
             for (Node pane:scorePane.getChildren()) {
-                ((ScoresList) ((VBox) pane).getChildren().get(1)).clearList();
+                ((ScoresList) ((BorderPane) pane).getCenter()).clearList();
             }
             scorePane.getChildren().removeAll(scorePane.getChildren().get(0));
             if(global){
                 global = !global;
                 scorePane.getChildren().add(localScorePane);
-                ((ScoresList) localScorePane.getChildren().get(1)).reveal();
+                ((ScoresList) localScorePane.getCenter()).reveal();
             }else{
                 global = !global;
                 scorePane.getChildren().add(remoteScorePane);
-                ((ScoresList) remoteScorePane.getChildren().get(1)).reveal();
+                ((ScoresList) remoteScorePane.getCenter()).reveal();
             }
         }
     }
@@ -154,47 +150,64 @@ public class ScoreScene extends BaseScene {
      * @param scores the list of scores
      * @return the Pane containing the Score List
      */
-    private VBox makePane(String titleText, SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
-        mainPane = new VBox();
+    protected BorderPane makePane(String titleText, SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
+        BorderPane mainPane = new BorderPane();
+        HBox topBar = new HBox();
         Text title = new Text(titleText);
+        title.setTextAlignment(TextAlignment.CENTER);
         title.getStyleClass().add("bigtitle");
-        mainPane.getChildren().add(title);
-        mainPane.setAlignment(Pos.CENTER);
-        mainPane.setSpacing(16);
+        topBar.getChildren().add(title);
+        topBar.setAlignment(Pos.CENTER);
+        mainPane.setTop(topBar);
         ScoresList scoresList;
-        if (score > 0) {
-            if (score > scores.get(scores.getSize() - 1).getValue()) {
+        if (score != null) {
+            if (scores.getSize() >= 10) {
+                if (score > scores.get(scores.getSize() - 1).getValue()) {
+                    name.addListener(this::nameUpdated);
+                    newScore = new Pair(name, score);
+                    scores.remove(scores.get(scores.getSize() - 1));
+                    scores.add(newScore);
+                    scores.sort(new ScoreComparator());
+                    scoresList = makeScores(scores, scores.lastIndexOf(newScore));
+                } else {
+                    scoresList = makeScores(scores);
+                }
+            } else {
                 name.addListener(this::nameUpdated);
                 newScore = new Pair(name, score);
-                scores.remove(scores.get(scores.getSize() - 1));
                 scores.add(newScore);
                 scores.sort(new ScoreComparator());
-                writeScores(fileName);
                 scoresList = makeScores(scores, scores.lastIndexOf(newScore));
-            } else {
-                scoresList = makeScores(scores);
             }
         }else{
             scoresList = makeScores(scores);
         }
-        mainPane.getChildren().add(scoresList);
-        Text instructions = new Text("Press Enter to toggle Local/Global Scores and press Esc to save your score and leave");
+        if (titleText.equals("Local High Scores")){
+            writeScores(fileName);
+        }
+        mainPane.setCenter(scoresList);
+        HBox bottomBar = new HBox();
+        Text instructions;
+        if (score != null) {
+            instructions = new Text("Press Enter to toggle Local/Global Scores and press Esc to save your score and leave");
+        }else{
+             instructions = new Text("Press Enter to toggle Local/Global Scores");
+        }
+        instructions.setTextAlignment(TextAlignment.CENTER);
         instructions.getStyleClass().add("messages");
-        mainPane.getChildren().add(instructions);
-
+        bottomBar.getChildren().add(instructions);
+        bottomBar.setAlignment(Pos.CENTER);
+        mainPane.setBottom(bottomBar);
         return mainPane;
     }
 
     /**
      * Load the local and remote scores
      */
-    private void loadScores(){
+    protected void loadScores(){
         loadOnlineScores();
-        loadLocalScores(fileName);
-        localScores.sort(new ScoreComparator());
-        localScorePane = makePane("Local High Scores", localScores);
-        logger.info("local scores loaded");
-        ((ScoresList) localScorePane.getChildren().get(1)).reveal();
+        localScorePane = makePane("Local High Scores", loadLocalScores(fileName));
+        ((ScoresList) (localScorePane.getCenter())).reveal();
         scorePane.getChildren().add(localScorePane);
     }
 
@@ -239,8 +252,9 @@ public class ScoreScene extends BaseScene {
     /**
      * Load the local scores from a scores file
      * @param fileName the name of the file containing the scores
+     * @return
      */
-    private void loadLocalScores(String fileName){
+    protected SimpleListProperty<Pair<SimpleStringProperty, Integer>> loadLocalScores(String fileName){
         ArrayList<Pair<SimpleStringProperty,Integer>> tempList= new ArrayList<>();
         FileHandler file = new FileHandler(fileName);
         file.setReader();
@@ -259,6 +273,9 @@ public class ScoreScene extends BaseScene {
         }
         tempList.sort(new ScoreComparator());
         localScores = new SimpleListProperty(FXCollections.observableArrayList(tempList));
+        localScores.sort(new ScoreComparator());
+        logger.info("local scores loaded");
+        return localScores;
 
 
     }
@@ -266,7 +283,7 @@ public class ScoreScene extends BaseScene {
     /**
      * Requests the online scores
      */
-    private void loadOnlineScores(){
+    protected void loadOnlineScores(){
         communicator.addListener((message) -> Platform.runLater(() -> this.receiveMessage(message)));
         communicator.send("HISCORES");
 
@@ -318,9 +335,11 @@ public class ScoreScene extends BaseScene {
     /**
      * Upload your score to the server
      */
-    private void writeOnlineScore(){
-        communicator.send(("HISCORE " + name.getValue() + ":" + score));
-        logger.info("Sent: " + ("HISCORE " + name.getValue() + ":" + score));
+    private void writeOnlineScore() {
+        if (score != null) {
+            communicator.send(("HISCORE " + name.getValue() + ":" + score));
+            logger.info("Sent: " + ("HISCORE " + name.getValue() + ":" + score));
+        }
     }
 
 

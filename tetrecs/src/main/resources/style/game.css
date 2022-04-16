@@ -46,7 +46,7 @@
 .bigtitle {
     -fx-fill: white;
     -fx-font-family: 'Orbitron';
-    -fx-font-size: 64px;
+    -fx-font-size: 48px;
     -fx-font-weight: 900;
     -fx-border-color: black;
     -fx-stroke: black;
@@ -207,8 +207,8 @@
 
 .messages {
     -fx-background-color: transparent;
-    -fx-font-size: 12px;
-    -fx-font-family: 'Orbitron';
+    -fx-font-size: 14px;
+    -fx-font-family: 'Orbitron-Regular';
     -fx-fill: white;
 }
 .messagePane {

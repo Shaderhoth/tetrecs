@@ -40,7 +40,15 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
     /**
      * The board showing the current game
      */
-    private GameBoard board;
+    protected GameBoard board;
+    /**
+     * The main window pane
+     */
+    protected BorderPane mainPane;
+    /**
+     * The base pane for the window
+     */
+    protected StackPane challengePane;
     /**
      * The sidebar showing various stats and useful info
      */
@@ -76,16 +84,16 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         media = new Multimedia("game.wav");
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
 
-        var challengePane = new StackPane();
+        challengePane = new StackPane();
         challengePane.setMaxWidth(gameWindow.getWidth());
         challengePane.setMaxHeight(gameWindow.getHeight());
         challengePane.getStyleClass().add("menu-background");
         root.getChildren().add(challengePane);
 
-        var mainPane = new BorderPane();
+        mainPane = new BorderPane();
         challengePane.getChildren().add(mainPane);
 
-        board = new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
+        board = makeBoard();
         mainPane.setCenter(board);
 
         sidePane = new SideBar();
@@ -114,6 +122,16 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
 
 
 
+    }
+
+    /**
+     * Makes a game-board
+     * Done separately to the rest, so I can override it on the multiplayer scene while having the rest of the build
+     * class work
+     * @return game board
+     */
+    protected GameBoard makeBoard(){
+        return new GameBoard(game.getGrid(),gameWindow.getWidth()/2,gameWindow.getWidth()/2);
     }
 
     /**
@@ -162,7 +180,7 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
      * @param event the click event
      * @param gameBlock the block that was clicked
      */
-    private void blockClicked(MouseEvent event, GameBlock gameBlock) {
+    protected void blockClicked(MouseEvent event, GameBlock gameBlock) {
         logger.info(gameBlock.getGameBoard().equals(board));
         if (event.getButton() == MouseButton.PRIMARY) {
             game.blockClicked();

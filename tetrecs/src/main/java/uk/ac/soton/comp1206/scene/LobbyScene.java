@@ -75,7 +75,7 @@ public class LobbyScene extends BaseScene {
     /**
      * A list of users connected to the game
      */
-    private String[] users = null;
+    private String users = null;
     /**
      * The delay before each successive request of active games
      */
@@ -131,7 +131,7 @@ public class LobbyScene extends BaseScene {
         }else if (message.startsWith("NICK ")){
             name = message.substring(5);
         }else if (message.startsWith("USERS ")){
-            users = message.substring(6).split("\n");
+            users = message;
             gameWindow.startGameLobby(channel,hosting,name,users, communicator);
         }else if (message.startsWith("ERROR ")){
             alert(message);
