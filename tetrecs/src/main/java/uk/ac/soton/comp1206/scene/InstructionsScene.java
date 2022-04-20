@@ -48,17 +48,20 @@ public class InstructionsScene extends BaseScene {
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
-
+        Multimedia.playMedia("menu.mp3");
 
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         var instructionsPane = new StackPane();
         instructionsPane.setMaxWidth(gameWindow.getWidth());
         instructionsPane.setMaxHeight(gameWindow.getHeight());
-        instructionsPane.getStyleClass().add("menu-background");
+        instructionsPane.getStyleClass().add("scene-background");
+        instructionsPane.setBackground(gameWindow.getBackground());
+
         root.getChildren().add(instructionsPane);
 
         var mainPane = new BorderPane();
+        mainPane.setBackground(gameWindow.getBackground());
         instructionsPane.getChildren().add(mainPane);
 
         //Awful title

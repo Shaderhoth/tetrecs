@@ -3,6 +3,7 @@ package uk.ac.soton.comp1206.scene;
 import javafx.application.Platform;
 import javafx.beans.Observable;
 import javafx.event.EventHandler;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
@@ -19,6 +20,8 @@ import uk.ac.soton.comp1206.game.GamePiece;
 import uk.ac.soton.comp1206.ui.GamePane;
 import uk.ac.soton.comp1206.ui.GameWindow;
 import uk.ac.soton.comp1206.utilities.Multimedia;
+
+import java.util.Objects;
 
 
 /**
@@ -81,16 +84,17 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         logger.info("Building " + this.getClass().getName());
 
         setupGame();
-        media = new Multimedia("game.wav");
+        Multimedia.playMedia("game.wav");
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
 
         challengePane = new StackPane();
         challengePane.setMaxWidth(gameWindow.getWidth());
         challengePane.setMaxHeight(gameWindow.getHeight());
-        challengePane.getStyleClass().add("menu-background");
+        challengePane.getStyleClass().add("scene-background");
         root.getChildren().add(challengePane);
 
         mainPane = new BorderPane();
+        mainPane.setBackground(gameWindow.getBackground());
         challengePane.getChildren().add(mainPane);
 
         board = makeBoard();
@@ -149,7 +153,7 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
      */
     public void gameOver() {
         Multimedia.playAudio("fail.wav");
-        media.stop();
+        game.endTimer();
         gameWindow.startEnd(game.scoreProperty().getValue());
 
     }
@@ -257,7 +261,6 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
      * Exit the game
      */
     private void exit(){
-        media.stop();
         game.endTimer();
         gameWindow.startMenu();
     }

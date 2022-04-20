@@ -7,12 +7,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.App;
 
+import java.util.Objects;
+
 /**
  * The multimedia class is used to play audio
  */
 public class Multimedia {
     /**
-     * The mesia player to play music
+     * The song track currently being played
+     */
+    private static String currentSong;
+    /**
+     * The media player to play music
      */
     private static MediaPlayer mediaPlayer;
     /**
@@ -33,7 +39,6 @@ public class Multimedia {
      * @param file
      */
     public static void playAudio(String file) {
-        if (!audioEnabled.get()) return;
 
         String toPlay = Multimedia.class.getResource("/sounds/" + file).toExternalForm();
         logger.info("Playing audio: " + toPlay);
@@ -53,30 +58,27 @@ public class Multimedia {
      * Initialise a media player with a background song on repeat
      * @param file the file containing the song
      */
-    public Multimedia(String file) {
-        if (!audioEnabled.get()) return;
-
-        String toPlay = Multimedia.class.getResource("/music/" + file).toExternalForm();
-        logger.info("Playing music: " + toPlay);
-        try {
-            Media play = new Media(toPlay);
-            mediaPlayer = new MediaPlayer(play);
-            mediaPlayer.setAutoPlay(true);
-            mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
-            mediaPlayer.play();
-        } catch (Exception e) {
-            audioEnabled.set(false);
-            e.printStackTrace();
-            logger.error("Unable to play audio file, disabling audio");
+    public static void playMedia(String file) {
+        if (!file.equals(currentSong)) {
+            if (mediaPlayer != null){
+                mediaPlayer.stop();
+            }
+            currentSong = file;
+            logger.info(file);
+            String toPlay = Multimedia.class.getResource("/music/" + file).toExternalForm();
+            logger.info("Playing music: " + toPlay);
+            try {
+                Media play = new Media(toPlay);
+                mediaPlayer = new MediaPlayer(play);
+                mediaPlayer.setAutoPlay(true);
+                mediaPlayer.setCycleCount(MediaPlayer.INDEFINITE);
+                mediaPlayer.play();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    /**
-     * stop playing media
-     */
-    public void stop(){
-        mediaPlayer.stop();
-    }
 
     /**
      * get the audio enabled property

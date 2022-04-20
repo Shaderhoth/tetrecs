@@ -6,18 +6,25 @@
     -fx-background-color: black;
 }
 
-.menu-background {
-    -fx-background-image: url("../images/1.jpg");
-    -fx-background-size: cover;
-}
 
-.challenge-background {
-    -fx-background-image: url("../images/2.jpg");
+.scene-background {
     -fx-background-size: cover;
 }
 
 .menu {
     -fx-padding: 10;
+}
+
+.optionItem {
+    -fx-text-fill: white;
+    -fx-border-width: 0;
+    -fx-background-color: #00000000;
+    -fx-background-color: #00000000;
+    -fx-font-family: 'Orbitron-Black';
+}
+
+.optionItem:hover {
+    -fx-background-color: #00000044;
 }
 
 .menuItem {
@@ -45,7 +52,7 @@
 }
 .bigtitle {
     -fx-fill: white;
-    -fx-font-family: 'Orbitron';
+    -fx-font-family: 'Orbitron-Regular';
     -fx-font-size: 48px;
     -fx-font-weight: 900;
     -fx-border-color: black;
@@ -55,14 +62,25 @@
 
 .title {
     -fx-fill: white;
-    -fx-font-family: 'Orbitron';
+    -fx-font-family: 'Orbitron-Regular';
     -fx-font-size: 32px;
     -fx-font-weight: 900;
     -fx-border-color: #00000000;
     -fx-stroke: blue;
     -fx-stroke-width: 1;
     -fx-background-color: #00000000;
-}.titlealternate {
+}
+.mini-title {
+    -fx-fill: white;
+    -fx-font-family: 'Orbitron-Regular';
+    -fx-font-size: 24px;
+    -fx-font-weight: 900;
+    -fx-border-color: #00000000;
+    -fx-stroke: blue;
+    -fx-stroke-width: 1;
+    -fx-background-color: #00000000;
+}
+.titlealternate {
     -fx-text-color: red;
     -fx-fill: red;
     -fx-font-family: 'Orbitron';
@@ -237,7 +255,7 @@ TextField {
 
 .playerBox {
     -fx-font-size: 14px;
-    -fx-font-family: 'Orbitron';
+    -fx-font-family: 'Orbitron-Regular';
 }
 
 .playerBox Text {

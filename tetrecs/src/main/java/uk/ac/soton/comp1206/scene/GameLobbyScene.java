@@ -40,7 +40,7 @@ public class GameLobbyScene extends BaseScene{
     /**
      * Its like a woodcutter except totally different
      */
-    private static final Logger logger = LogManager.getLogger(GameLobbyScene.class);
+    private static final Logger logger = LogManager.getLogger(OptionsScene.class);
     /**
      * Necessary for communication with the server
      */
@@ -119,13 +119,16 @@ public class GameLobbyScene extends BaseScene{
     public void build() {
         logger.info("Building " + this.getClass().getName());
 
+        Multimedia.playMedia("menu.mp3");
         //Setup scene with a border pane
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         basePane = new StackPane();
         lobbyPane = new BorderPane();
         lobbyPane.setMaxWidth(gameWindow.getWidth());
         lobbyPane.setMaxHeight(gameWindow.getHeight());
-        lobbyPane.getStyleClass().add("menu-background");
+        lobbyPane.getStyleClass().add("scene-background");
+        lobbyPane.setBackground(gameWindow.getBackground());
+        basePane.setBackground(gameWindow.getBackground());
         root.getChildren().add(basePane);
         basePane.getChildren().add(lobbyPane);
 
@@ -207,21 +210,29 @@ public class GameLobbyScene extends BaseScene{
         if (message.startsWith("MSG ")){
             addMessage(message);
         }else if (message.startsWith("USERS ")){
+            addNotification(message.replace("\n"," "));
             userList.addUsers(message);
         }else if (message.startsWith("NICK ")){
+            if (message.contains(":")) {
+                var components = message.substring(5).split(":");
+                addNotification("Nickname changed: " + components[0] + " -> " + components[1]);
+            }
 //            rename(message);
         }else if (message.startsWith("START")){
+            addNotification(message);
             userList.setPlaying(scroller, messages, sendMessageBar, communicator);
             gameWindow.startMultiplayer(communicator,userList);
         }else if (message.startsWith("SCORES ")){
             userList.addUsers(message);
         }else if (message.startsWith("HOST")){
+            addNotification("You have been made host");
             host = true;
             HBox startButton = userList.addStartButton();
             if (startButton != null){
                 startButton.setOnMouseClicked((x) -> {communicator.send("START");});
             }
         }else if (message.startsWith("ERROR ")){
+            addNotification(message);
             alert(message);
         }
     }
@@ -265,6 +276,30 @@ public class GameLobbyScene extends BaseScene{
         //Make the message into a Text node
         Text receivedMessage = new Text(username + ": " + text + "\n");
         receivedMessage.getStyleClass().add("messages");
+        receivedMessage.setStroke(Color.WHITE);
+
+        //Add this message to the TextFlow
+        messages.getChildren().add(receivedMessage);
+
+        //Scroll to bottom
+        if(scroller.getVvalue() == 0.0f || scroller.getVvalue() > 0.9f) {
+            scrollToBottom = true;
+        }
+    }
+    /**
+     * Add a received notification to the messages TextFlow
+     * @param message the notification to be added
+     */
+    public void addNotification(String message) {
+
+        //Play incoming message sound
+        Multimedia.playAudio("message.wav");
+
+        //Make the message into a Text node
+        Text receivedMessage = new Text(message + "\n");
+        receivedMessage.getStyleClass().add("messages");
+        receivedMessage.setFill(Color.YELLOW);
+        receivedMessage.setStroke(Color.YELLOW);
 
         //Add this message to the TextFlow
         messages.getChildren().add(receivedMessage);

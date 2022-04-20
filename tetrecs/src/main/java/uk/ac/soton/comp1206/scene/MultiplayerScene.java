@@ -126,7 +126,6 @@ public class MultiplayerScene extends ChallengeScene{
     public void gameOver() {
         communicator.send("DIE");
         Multimedia.playAudio("fail.wav");
-        media.stop();
         game.endTimer();
         gameWindow.startEnd(game.scoreProperty().getValue(), lastKnownScores, userList.getUsername());
 
@@ -162,7 +161,6 @@ public class MultiplayerScene extends ChallengeScene{
      */
     private void exit(){
         communicator.send("DIE");
-        media.stop();
         game.endTimer();
         gameWindow.startMenu();
     }

@@ -47,14 +47,16 @@ public class MenuScene extends BaseScene {
         logger.info("Building " + this.getClass().getName());
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
-        media = new Multimedia("menu.mp3");
+        Multimedia.playMedia("menu.mp3");
         var menuPane = new StackPane();
         menuPane.setMaxWidth(gameWindow.getWidth());
         menuPane.setMaxHeight(gameWindow.getHeight());
-        menuPane.getStyleClass().add("menu-background");
+        menuPane.getStyleClass().add("scene-background");
+        menuPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(menuPane);
 
         var mainPane = new BorderPane();
+        mainPane.setBackground(gameWindow.getBackground());
         menuPane.getChildren().add(mainPane);
 
         //Awful title
@@ -110,6 +112,8 @@ public class MenuScene extends BaseScene {
             button.setOnMouseClicked(this::showScores);
         }else if (name.equals("MULTI PLAYER")) {
             button.setOnMouseClicked(this::startLobby);
+        }else if (name.equals("OPTIONS")) {
+            button.setOnMouseClicked(this::startOptions);
         }
 
         return button;
@@ -135,12 +139,11 @@ public class MenuScene extends BaseScene {
      * @param event event
      */
     private void startGame(MouseEvent event) {
-        media.stop();
         gameWindow.startChallenge();
     }
 
     /**
-     * Handle when the showInstructions button is pressed
+     * Handle when the Instructions button is pressed
      * @param event the click event on the showInstructions button
      */
     private void showInstructions(MouseEvent event) {
@@ -148,7 +151,7 @@ public class MenuScene extends BaseScene {
     }
 
     /**
-     * Handle when the showScores button is pressed
+     * Handle when the Scores button is pressed
      * @param event the click event on the showScores button
      */
     private void showScores(MouseEvent event) {
@@ -156,11 +159,19 @@ public class MenuScene extends BaseScene {
     }
 
     /**
-     * Handle when the startLobby button is pressed
+     * Handle when the Lobby button is pressed
      * @param event the click event on the startLobby button
      */
     private void startLobby(MouseEvent event) {
         gameWindow.startLobby();
+    }
+
+    /**
+     * Handle when the Options button is pressed
+     * @param event the click event on the startLobby button
+     */
+    private void startOptions(MouseEvent event) {
+        gameWindow.startOptions();
     }
 
 }

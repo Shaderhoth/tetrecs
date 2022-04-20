@@ -1,13 +1,9 @@
 package uk.ac.soton.comp1206.ui;
 
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.StringProperty;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
+import javafx.scene.image.Image;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -19,6 +15,8 @@ import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
 import uk.ac.soton.comp1206.utilities.Multimedia;
 
+import java.util.Objects;
+
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
  * we simply change the scene.
@@ -27,6 +25,15 @@ import uk.ac.soton.comp1206.utilities.Multimedia;
  * methods here to add more screens to the game.
  */
 public class GameWindow {
+
+    /**
+     * The background
+     */
+    private Background background = new Background(new BackgroundImage(new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/1.jpg")).toExternalForm()), BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,BackgroundSize.DEFAULT));
+     /**
+     * The background image
+     */
+    private Image image;
     /**
      * ...
      * Posts info to the console
@@ -104,6 +111,13 @@ public class GameWindow {
      */
     public void startMenu() {
         loadScene(new MenuScene(this));
+    }
+
+    /**
+     * Display the options screen
+     */
+    public void startOptions() {
+        loadScene(new OptionsScene(this));
     }
 
     /**
@@ -261,6 +275,23 @@ public class GameWindow {
      */
     public Communicator getCommunicator() {
         return communicator;
+    }
+
+    /**
+     * Get the background
+     * @return the background
+     */
+    public Background getBackground() {
+
+        return background;
+
+    }/**
+     * Set the background image
+     */
+    public void setBackground(String path) {
+        logger.info("New background: " + path);
+        image = new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/" + path)).toExternalForm());
+        background = new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, false, true)));
     }
 
 }

@@ -108,14 +108,17 @@ public class ScoreScene extends BaseScene {
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
-        media = new Multimedia("menu.mp3");
+        Multimedia.playMedia("end.wav");
+
 
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         scorePane = new StackPane();
         scorePane.setMaxWidth(gameWindow.getWidth());
         scorePane.setMaxHeight(gameWindow.getHeight());
-        scorePane.getStyleClass().add("menu-background");
+        scorePane.getStyleClass().add("scene-background");
+        scorePane.setBackground(gameWindow.getBackground());
+
         root.getChildren().add(scorePane);
 
 
@@ -152,6 +155,8 @@ public class ScoreScene extends BaseScene {
      */
     protected BorderPane makePane(String titleText, SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
         BorderPane mainPane = new BorderPane();
+        mainPane.setBackground(gameWindow.getBackground());
+
         HBox topBar = new HBox();
         Text title = new Text(titleText);
         title.setTextAlignment(TextAlignment.CENTER);
@@ -328,7 +333,6 @@ public class ScoreScene extends BaseScene {
      */
     private void exit(){
         writeOnlineScore();
-        media.stop();
         gameWindow.startMenu();
     }
 

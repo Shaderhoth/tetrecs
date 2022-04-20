@@ -73,16 +73,18 @@ public class EndScene extends BaseScene {
     public void build() {
         logger.info("Building " + this.getClass().getName());
 
-        media = new Multimedia("end.wav");
+        Multimedia.playMedia("end.wav");
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         var endPane = new StackPane();
         endPane.setMaxWidth(gameWindow.getWidth());
         endPane.setMaxHeight(gameWindow.getHeight());
-        endPane.getStyleClass().add("menu-background");
+        endPane.getStyleClass().add("score-background");
+        endPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(endPane);
 
         VBox mainPane = new VBox();
+        mainPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(mainPane);
         //Awful title
         var title = new Text("GAME OVER");
@@ -100,7 +102,6 @@ public class EndScene extends BaseScene {
      * End the end
      */
     private void exit(){
-        media.stop();
         if (scores != null){
             gameWindow.startMultiplayerScore(score, scores, name);
         }else {

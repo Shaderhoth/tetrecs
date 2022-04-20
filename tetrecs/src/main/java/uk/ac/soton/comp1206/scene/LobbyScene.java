@@ -6,6 +6,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -171,6 +172,7 @@ public class LobbyScene extends BaseScene {
     @Override
     public void build() {
         logger.info("Building " + this.getClass().getName());
+        Multimedia.playMedia("menu.mp3");
         communicator.addListener((message) -> Platform.runLater(() -> this.receiveMessage(message)));
         requestChannels();
 
@@ -180,11 +182,13 @@ public class LobbyScene extends BaseScene {
         lobbyPane = new StackPane();
         lobbyPane.setMaxWidth(gameWindow.getWidth());
         lobbyPane.setMaxHeight(gameWindow.getHeight());
-        lobbyPane.getStyleClass().add("menu-background");
+        lobbyPane.getStyleClass().add("scene-background");
+        lobbyPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(lobbyPane);
 
 
         BorderPane mainPane = new BorderPane();
+        mainPane.setBackground(gameWindow.getBackground());
         mainPane.setMaxWidth(gameWindow.getWidth());
         mainPane.setMinWidth(gameWindow.getWidth());
         lobbyPane.getChildren().add(mainPane);
@@ -198,9 +202,17 @@ public class LobbyScene extends BaseScene {
         topBar.setAlignment(Pos.CENTER);
         mainPane.setTop(topBar);
 
+
         channelPane = new VBox();
-        mainPane.setCenter(channelPane);
         channelPane.setAlignment(Pos.CENTER);
+
+        //Add a scrollpane
+        ScrollPane scroller = new ScrollPane();
+        scroller.getStyleClass().add("messagePane");
+        scroller.setContent(channelPane);
+        scroller.setFitToWidth(true);
+        mainPane.setCenter(scroller);
+        scroller.setPadding(new Insets(16));
 
         HBox bottomBar = new HBox();
         HBox newChannel = new HBox();
