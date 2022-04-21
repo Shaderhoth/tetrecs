@@ -291,7 +291,7 @@ public class GameWindow {
     public void setBackground(String path) {
         logger.info("New background: " + path);
         image = new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/" + path)).toExternalForm());
-        background = new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT,new BackgroundSize(BackgroundSize.AUTO, BackgroundSize.AUTO, true, true, false, true)));
+        background = new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(image.getWidth() / Math.min((image.getWidth() / getWidth()),(image.getHeight()/getHeight())), image.getHeight() / Math.min((image.getWidth() / getWidth()),(image.getHeight()/getHeight())), false, false, false, false)));
     }
 
 }

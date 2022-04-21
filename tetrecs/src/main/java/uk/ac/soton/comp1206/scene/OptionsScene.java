@@ -165,7 +165,7 @@ public class OptionsScene extends BaseScene {
             var image = new ImageView(new Image(this.getClass().getResource("/backgrounds/" + path).toExternalForm()));
             image.setPreserveRatio(true);
             image.setFitWidth(modifierPane.getWidth()/2);
-            image.setOnMouseClicked((mouseevent) -> {gameWindow.setBackground(path);mainPane.setBackground(gameWindow.getBackground());});
+            image.setOnMouseClicked((mouseevent) -> {mainPane.setBackground(Background.EMPTY);gameWindow.setBackground(path);mainPane.setBackground(gameWindow.getBackground());});
             box.getChildren().add(image);
             box.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
             box.setMaxHeight(image.getFitHeight());
