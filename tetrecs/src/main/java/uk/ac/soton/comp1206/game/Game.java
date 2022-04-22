@@ -160,7 +160,7 @@ public class Game {
                 }
             }
         };
-        timer.scheduleAtFixedRate(task, getTimerDelay(), getTimerDelay());
+        timer.schedule(task, getTimerDelay());
 
     }
 
@@ -195,6 +195,7 @@ public class Game {
         if (gameLoopListener != null) {
             gameLoopListener.gameLoop(getTimerDelay());
         }
+        resetTimer();
     }
     /**
      * Start the game
