@@ -38,6 +38,10 @@ public class EndScene extends BaseScene {
      * The name of the user
      */
     private final String name;
+    /**
+     * The Bottom pane on top of which everything else is placed
+     */
+    private StackPane endPane;
 
     /**
      * A very useful media player
@@ -76,15 +80,18 @@ public class EndScene extends BaseScene {
         Multimedia.playMedia("end.wav");
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
-        var endPane = new StackPane();
+        endPane = new StackPane();
         endPane.setMaxWidth(gameWindow.getWidth());
         endPane.setMaxHeight(gameWindow.getHeight());
         endPane.getStyleClass().add("score-background");
-        endPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(endPane);
 
         VBox mainPane = new VBox();
-        mainPane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            endPane.getChildren().add(Multimedia.getVideo());
+        }else {
+            mainPane.setBackground(gameWindow.getBackground());
+        }
         root.getChildren().add(mainPane);
         //Awful title
         var title = new Text("GAME OVER");
@@ -120,6 +127,7 @@ public class EndScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    endPane.getChildren().get(endPane.getChildren().size()-1).setVisible(! endPane.getChildren().get(endPane.getChildren().size()-1).isVisible()); break;
                     default:    exit(); break;
                 }
             }

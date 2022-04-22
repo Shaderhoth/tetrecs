@@ -73,7 +73,7 @@ public class Prompt extends VBox{
 
     /**
      * Defines a listener to activate when the prompt is exited
-     * @param promptExitListener
+     * @param promptExitListener the listener to check for when a prompt is exited
      */
     public void setOnExit(PromptExitListener promptExitListener){
         this.promptExitListener = promptExitListener;

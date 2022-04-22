@@ -12,8 +12,18 @@ import uk.ac.soton.comp1206.game.Grid;
  * A smaller variant of the game-board to display a singular piece
  */
 public class PieceBoard extends GameBoard{
+    /**
+     * The listener to check when a piece is spawned
+     */
     public PieceSpawnedListener pieceSpawnedListener;
+    /**
+     * Another woodcutter to tell us stuff we already know
+     * Likes to gossip a lot
+     */
     private static final Logger logger = LogManager.getLogger(PieceBoard.class);
+    /**
+     *
+     */
     private BlockClickedListener blockClickedListener;
     private final int cols;
     private final int rows;

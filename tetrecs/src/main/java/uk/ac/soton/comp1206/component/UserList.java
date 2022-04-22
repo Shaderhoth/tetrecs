@@ -158,6 +158,10 @@ public class UserList extends VBox {
 
     /**
      * Sets the pane to show the chatwindow and leaderboard
+     * @param scroller the chatwindow scroller pane
+     * @param messages the collection of prior messages
+     * @param sendMessageBar the message bar to send messages
+     * @param communicator the communicator to talk to the server
      */
     public void setPlaying(ScrollPane scroller, TextFlow messages, HBox sendMessageBar, Communicator communicator){
         if (startButton != null) {
@@ -171,14 +175,15 @@ public class UserList extends VBox {
         getScene().addPostLayoutPulseListener(this::jumpToBottom);
         this.messages = messages;
     }
+
+    /**
+     * Checks if the message is currently being focused
+     * @return
+     */
     public boolean msgIsFocused(){
         return (((HBox) chatWindow.getBottom()).getChildren().get(0)).isFocused();
     }
 
-
-    public void reqMsgFocus() {
-        (((HBox) chatWindow.getBottom()).getChildren().get(0)).requestFocus();
-    }
     /**
      * Add a message to the chat window
      * @param message The message to add
@@ -322,6 +327,11 @@ public class UserList extends VBox {
             });
         }
     }
+
+    /**
+     * Gets the name of the user
+     * @return the username
+     */
     public String getUsername(){
         return username.getText();
     }

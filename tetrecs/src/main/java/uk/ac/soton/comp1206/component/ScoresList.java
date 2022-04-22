@@ -46,7 +46,7 @@ public class ScoresList extends VBox {
     /**
      * The location of the user on the scoreboard
      */
-    private Integer index = -1;
+    public Integer index = -1;
 
     /**
      * Initialise the list with the top scores

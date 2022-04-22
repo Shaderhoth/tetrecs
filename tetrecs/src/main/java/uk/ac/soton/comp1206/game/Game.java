@@ -184,6 +184,7 @@ public class Game {
      */
     private void gameLoop(){
         livesProperty().set(livesProperty().get()-1);
+        Multimedia.playAudio("explode.wav");
         if (livesProperty().getValue() <0){
             if (gameOverListener != null) {
                 gameOverListener.gameOver();

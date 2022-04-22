@@ -70,7 +70,7 @@ public class GameLobbyScene extends BaseScene{
      */
     private BorderPane lobbyPane;
     /**
-     * encapsulates the main pain so I can overlay the prompt
+     * The Bottom pane on top of which everything else is placed
      */
     private StackPane basePane;
     /**
@@ -127,8 +127,11 @@ public class GameLobbyScene extends BaseScene{
         lobbyPane.setMaxWidth(gameWindow.getWidth());
         lobbyPane.setMaxHeight(gameWindow.getHeight());
         lobbyPane.getStyleClass().add("scene-background");
-        lobbyPane.setBackground(gameWindow.getBackground());
-        basePane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            basePane.getChildren().add(Multimedia.getVideo());
+        }else {
+            basePane.setBackground(gameWindow.getBackground());
+        }
         root.getChildren().add(basePane);
         basePane.getChildren().add(lobbyPane);
 
@@ -340,6 +343,7 @@ public class GameLobbyScene extends BaseScene{
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    basePane.getChildren().get(basePane.getChildren().size()-1).setVisible(! basePane.getChildren().get(basePane.getChildren().size()-1).isVisible()); break;
                     case ESCAPE:    exit(); break;
                 }
             }

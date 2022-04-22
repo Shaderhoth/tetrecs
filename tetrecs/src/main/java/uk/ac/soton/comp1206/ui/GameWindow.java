@@ -1,9 +1,14 @@
 package uk.ac.soton.comp1206.ui;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaView;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -15,7 +20,10 @@ import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.scene.*;
 import uk.ac.soton.comp1206.utilities.Multimedia;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.Objects;
+import java.util.Properties;
 
 /**
  * The GameWindow is the single window for the game where everything takes place. To move between screens in the game,
@@ -27,13 +35,16 @@ import java.util.Objects;
 public class GameWindow {
 
     /**
-     * The background
+     * Do I antialias?
+     * only for the chunkiest of PCs
      */
-    private Background background = new Background(new BackgroundImage(new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/1.jpg")).toExternalForm()), BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,BackgroundSize.DEFAULT));
-     /**
+    public SimpleBooleanProperty antiAlias = new SimpleBooleanProperty(true);
+
+    /**
      * The background image
      */
-    private Image image;
+    private String image = "/backgrounds/1.jpg";
+
     /**
      * ...
      * Posts info to the console
@@ -42,11 +53,11 @@ public class GameWindow {
     /**
      * the width of the window
      */
-    private final int width;
+    public static int width;
     /**
      * The height of the window
      */
-    private final int height;
+    public static int height;
     /**
      * The Stage
      */
@@ -63,6 +74,10 @@ public class GameWindow {
      * The communicator
      */
     final Communicator communicator;
+    /**
+     * The properties file
+     */
+    public Properties props;
 
 
 
@@ -78,6 +93,27 @@ public class GameWindow {
 
         this.stage = stage;
 
+
+        try {
+            props = new Properties();
+            FileInputStream input = new FileInputStream("src/main/resources/data/config.properties");
+            props.load(input);
+            antiAlias.setValue(Boolean.parseBoolean(props.getProperty("antialias","true")));
+            this.width = (Integer.parseInt(props.getProperty("width",Integer.toString(width))));
+            this.height = (Integer.parseInt(props.getProperty("height",Integer.toString(height))));
+            Multimedia.getAudioVolume().set(Double.parseDouble(props.getProperty("audio","1.0")));
+            Multimedia.getMediaVolume().set(Double.parseDouble(props.getProperty("media","1.0")));
+            this.image = (props.getProperty("image","/backgrounds/1.jpg"));
+            antiAlias.addListener(this::updateAntiAlias);
+            Multimedia.getAudioVolume().addListener(this::updateAudioVolume);
+            Multimedia.getMediaVolume().addListener(this::updateMediaVolume);
+
+
+
+        } catch (Exception e){
+            logger.error("Unable to lead config file");
+            logger.error(e);
+        }
         //Setup window
         setupStage();
 
@@ -92,6 +128,29 @@ public class GameWindow {
 
         //Go to menu
         startMenu();
+    }
+
+
+    /**
+     * Updates the audio volume property on the config file
+     */
+    private void updateAudioVolume(ObservableValue<? extends Number> observableValue, Number object, Number object1) {
+        writeOut("audio", object1.toString());
+
+    }
+    /**
+     * Updates the media volume property on the config file
+     */
+    private void updateMediaVolume(ObservableValue<? extends Number> observableValue, Number object, Number object1) {
+        writeOut("media", object1.toString());
+
+    }
+
+    /**
+     * Updates the antialias property on the config file
+     */
+    private void updateAntiAlias(ObservableValue<? extends Boolean> observableValue, Boolean object, Boolean object1) {
+        writeOut("antialias", Boolean.toString(antiAlias.get()));
     }
 
     /**
@@ -218,7 +277,7 @@ public class GameWindow {
         Multimedia.playAudio("transition.wav");
         //Cleanup remains of the previous scene
         cleanup();
-
+        currentScene = null;
         //Create the new scene and set it up
         newScene.build();
         currentScene = newScene;
@@ -233,7 +292,8 @@ public class GameWindow {
      * Setup the default scene (an empty black scene) when no scene is loaded
      */
     public void setupDefaultScene() {
-        this.scene = new Scene(new Pane(),width,height, Color.BLACK);
+        this.scene = new Scene(new Pane(),width,height, false, getAntiAlias());
+        scene.setFill(Color.BLACK);
         stage.setScene(this.scene);
     }
 
@@ -282,16 +342,50 @@ public class GameWindow {
      * @return the background
      */
     public Background getBackground() {
+        Image img = new Image(Objects.requireNonNull(this.getClass().getResource(image)).toExternalForm());
 
-        return background;
+        return new Background(new BackgroundImage(img, BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(img.getWidth() / Math.min((img.getWidth() / getWidth()),(img.getHeight()/getHeight())), img.getHeight() / Math.min((img.getWidth() / getWidth()),(img.getHeight()/getHeight())), false, false, false, false)));
 
-    }/**
+    }
+    /**
      * Set the background image
      */
     public void setBackground(String path) {
         logger.info("New background: " + path);
-        image = new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/" + path)).toExternalForm());
-        background = new Background(new BackgroundImage(image, BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER,new BackgroundSize(image.getWidth() / Math.min((image.getWidth() / getWidth()),(image.getHeight()/getHeight())), image.getHeight() / Math.min((image.getWidth() / getWidth()),(image.getHeight()/getHeight())), false, false, false, false)));
+        image = "/backgrounds/" + path;
+        writeOut("image",image);
     }
 
+    public void resize(int width, int height) {
+
+        writeOut("width",Integer.toString(width));
+        writeOut("height",Integer.toString(height));
+        stage.setMinWidth(width);
+        stage.setMinHeight(height);
+        this.width = width;
+        this.height = height;
+
+
+    }
+    public SceneAntialiasing getAntiAlias(){
+        if (antiAlias.get()){
+            return SceneAntialiasing.BALANCED;
+        }
+        return SceneAntialiasing.DISABLED;
+    }
+    public void writeOut(String key, String value){
+
+        try {
+
+            FileOutputStream output = new FileOutputStream("src/main/resources/data/config.properties");
+            props.put(key, value);
+            props.store(output, "This is a properties file");
+            logger.info("Stored " + key + " successfully");
+            logger.info(props.getProperty(key));
+        } catch (Exception e){
+            logger.error("Unable to store config file");
+            logger.error(e);
+        }
+
+    }
 }

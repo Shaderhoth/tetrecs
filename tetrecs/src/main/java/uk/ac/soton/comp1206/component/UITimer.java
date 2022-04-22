@@ -61,7 +61,7 @@ public class UITimer extends Canvas {
 
     /**
      * Reset the timer once complete or if the user has made a move
-     * @param time
+     * @param time the amout of time to count down
      */
     public void resetTimer(int time){
         if (timer != null){

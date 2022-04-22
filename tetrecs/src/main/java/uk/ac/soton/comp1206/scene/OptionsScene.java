@@ -4,11 +4,13 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.PickResult;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -51,6 +53,10 @@ public class OptionsScene extends BaseScene {
      */
     private BorderPane mainPane;
     /**
+     * The base pane on which everything else is stacked
+     */
+    private StackPane optionsPane;
+    /**
      * Create a new scene
      * @param gameWindow the Game Window this will be displayed in
      */
@@ -69,20 +75,23 @@ public class OptionsScene extends BaseScene {
 
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
-        var optionsPane = new StackPane();
+        optionsPane = new StackPane();
         optionsPane.setMaxWidth(gameWindow.getWidth());
         optionsPane.setMaxHeight(gameWindow.getHeight());
         optionsPane.getStyleClass().add("scene-background");
-        optionsPane.setBackground(gameWindow.getBackground());
 
         root.getChildren().add(optionsPane);
 
         mainPane = new BorderPane();
-        mainPane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            optionsPane.getChildren().add(Multimedia.getVideo());
+        }else {
+            mainPane.setBackground(gameWindow.getBackground());
+        }
         optionsPane.getChildren().add(mainPane);
 
         var title = new Text("TetrECS");
-        title.getStyleClass().add("title");
+        title.getStyleClass().add("bigtitle");
         mainPane.setTop(title);
         optionsPane.setAlignment(Pos.CENTER);
 
@@ -103,9 +112,12 @@ public class OptionsScene extends BaseScene {
 
 
         var graphics = makeCategory("Graphics");
-        graphics.setOnMouseClicked(this::showGraphics);
+        graphics.setOnMouseClicked((mouseEvent) -> {showGraphics();});
         categoryPane.getChildren().add(graphics);
 
+        var sound = makeCategory("Sound");
+        sound.setOnMouseClicked((mouseEvent) -> {showSound();});
+        categoryPane.getChildren().add(sound);
 
 
     }
@@ -147,9 +159,25 @@ public class OptionsScene extends BaseScene {
 
     /**
      * Show all that graphics properties that can be modified, and the methods to modify them
-     * @param event the initialisation event
      */
-    private void showGraphics(MouseEvent event){
+    private void showSound(){
+        clear();
+        modifierPane.getChildren().add(subtitle("Media Volume"));
+        var mediaSlider = new Slider(0,1,Multimedia.getMediaVolume().get());
+        modifierPane.getChildren().add(mediaSlider);
+        mediaSlider.valueProperty().bindBidirectional(Multimedia.getMediaVolume());
+
+
+        modifierPane.getChildren().add(subtitle("Audio Volume"));
+        var audioSlider = new Slider(0,1,Multimedia.getAudioVolume().get());
+        modifierPane.getChildren().add(audioSlider);
+        audioSlider.valueProperty().bindBidirectional(Multimedia.getAudioVolume());
+    }
+
+    /**
+     * Show all that graphics properties that can be modified, and the methods to modify them
+     */
+    private void showGraphics(){
         clear();
 
         modifierPane.getChildren().add(subtitle("Background"));
@@ -165,7 +193,12 @@ public class OptionsScene extends BaseScene {
             var image = new ImageView(new Image(this.getClass().getResource("/backgrounds/" + path).toExternalForm()));
             image.setPreserveRatio(true);
             image.setFitWidth(modifierPane.getWidth()/2);
-            image.setOnMouseClicked((mouseevent) -> {mainPane.setBackground(Background.EMPTY);gameWindow.setBackground(path);mainPane.setBackground(gameWindow.getBackground());});
+            image.setOnMouseClicked((mouseevent) -> {
+                mainPane.setBackground(Background.EMPTY);
+                gameWindow.setBackground(path);
+                optionsPane.getChildren().removeAll(Multimedia.getVideo());
+                Multimedia.setVideo();
+                mainPane.setBackground(gameWindow.getBackground());});
             box.getChildren().add(image);
             box.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,CornerRadii.EMPTY,BorderWidths.DEFAULT)));
             box.setMaxHeight(image.getFitHeight());
@@ -180,9 +213,45 @@ public class OptionsScene extends BaseScene {
         scroller.setFitToHeight(true);
         scroller.setPadding(Insets.EMPTY);
         scroller.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
-
         modifierPane.getChildren().add(scroller);
-//        new Image(Objects.requireNonNull(this.getClass().getResource("/backgrounds/1.jpg")).toExternalForm());
+
+        modifierPane.getChildren().add(subtitle("Resolution"));
+        var entry = new HBox();
+        var width = new TextField("1920");
+        var height = new TextField("1080");
+        var button = new Button("Submit");
+        button.setOnMouseClicked((mouseEvent) -> {updateResolution(width.getText(),height.getText());
+            gameWindow.startMenu();} );
+        entry.getChildren().add(width);
+        entry.getChildren().add(height);
+        entry.getChildren().add(button);
+        modifierPane.getChildren().add(entry);
+
+
+        modifierPane.getChildren().add(subtitle("Antialias"));
+
+        CheckBox antialias = new CheckBox("Antialiasing");
+        antialias.getStyleClass().add("checkbox");
+        antialias.selectedProperty().bindBidirectional(gameWindow.antiAlias);
+        modifierPane.getChildren().add(antialias);
+
+
+        modifierPane.getChildren().add(subtitle("Background Video (Press ALT to access)"));
+        var vEntry = new HBox();
+        var videoLink = new TextField("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        var vButton = new Button("Submit");
+        vButton.setOnMouseClicked((mouseEvent) -> {Multimedia.setVideo(videoLink.getText());gameWindow.startMenu();});
+        vEntry.getChildren().add(videoLink);
+        vEntry.getChildren().add(vButton);
+        modifierPane.getChildren().add(vEntry);
+
+
+    }
+
+    private void updateResolution(String width, String height){
+        gameWindow.resize(Integer.parseInt(width), Integer.parseInt(height));
+
+        build();
     }
 
 
@@ -196,6 +265,8 @@ public class OptionsScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    optionsPane.getChildren().get(optionsPane.getChildren().size()-1).setVisible(! optionsPane.getChildren().get(optionsPane.getChildren().size()-1).isVisible()); break;
+
                     case ESCAPE:    gameWindow.startMenu(); break;
                 }
             }

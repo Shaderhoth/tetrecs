@@ -8,16 +8,17 @@ import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.web.WebView;
 import javafx.util.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.ac.soton.comp1206.component.Prompt;
 import uk.ac.soton.comp1206.component.ScoresList;
 import uk.ac.soton.comp1206.network.Communicator;
 import uk.ac.soton.comp1206.ui.GamePane;
@@ -28,7 +29,9 @@ import uk.ac.soton.comp1206.utilities.ScoreComparator;
 
 import java.util.ArrayList;
 
-
+/**
+ * The scene containing all of the various scores
+ */
 public class ScoreScene extends BaseScene {
     /**
      * Do I have to do this every time?
@@ -117,7 +120,11 @@ public class ScoreScene extends BaseScene {
         scorePane.setMaxWidth(gameWindow.getWidth());
         scorePane.setMaxHeight(gameWindow.getHeight());
         scorePane.getStyleClass().add("scene-background");
-        scorePane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            scorePane.getChildren().add(Multimedia.getVideo());
+        }else {
+            scorePane.setBackground(gameWindow.getBackground());
+        }
 
         root.getChildren().add(scorePane);
 
@@ -132,9 +139,16 @@ public class ScoreScene extends BaseScene {
     protected void toggleScreen(){
         if (localScorePane != null && remoteScorePane != null){
             for (Node pane:scorePane.getChildren()) {
-                ((ScoresList) ((BorderPane) pane).getCenter()).clearList();
+                if (pane instanceof BorderPane) {
+                    ((ScoresList) ((BorderPane) pane).getCenter()).clearList();
+                }
             }
-            scorePane.getChildren().removeAll(scorePane.getChildren().get(0));
+            if (scorePane.getChildren().get(0) instanceof WebView){
+
+                scorePane.getChildren().removeAll(scorePane.getChildren().get(1));
+            }else {
+                scorePane.getChildren().removeAll(scorePane.getChildren().get(0));
+            }
             if(global){
                 global = !global;
                 scorePane.getChildren().add(localScorePane);
@@ -155,7 +169,7 @@ public class ScoreScene extends BaseScene {
      */
     protected BorderPane makePane(String titleText, SimpleListProperty<Pair<SimpleStringProperty,Integer>> scores){
         BorderPane mainPane = new BorderPane();
-        mainPane.setBackground(gameWindow.getBackground());
+        mainPane.setBackground(Background.EMPTY);
 
         HBox topBar = new HBox();
         Text title = new Text(titleText);
@@ -214,6 +228,10 @@ public class ScoreScene extends BaseScene {
         localScorePane = makePane("Local High Scores", loadLocalScores(fileName));
         ((ScoresList) (localScorePane.getCenter())).reveal();
         scorePane.getChildren().add(localScorePane);
+        if (((ScoresList) localScorePane.getCenter()).index >= 0){
+            getName();
+        }
+
     }
 
     /**
@@ -282,6 +300,20 @@ public class ScoreScene extends BaseScene {
         logger.info("local scores loaded");
         return localScores;
 
+
+    }
+
+    /**
+     * Requests a username
+     */
+    private void getName() {
+        TextField getName = new TextField("");
+        getName.textProperty().bindBidirectional(name);
+        Prompt prompt = new Prompt("Enter Name", getName, gameWindow.getWidth());
+        scorePane.getChildren().add(prompt);
+        prompt.setOnExit(() -> {
+            scorePane.getChildren().removeAll(prompt);
+        });
 
     }
 
@@ -357,6 +389,8 @@ public class ScoreScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    scorePane.getChildren().get(scorePane.getChildren().size()-1).setVisible(! scorePane.getChildren().get(scorePane.getChildren().size()-1).isVisible()); break;
+
                     case ESCAPE:    exit(); break;
                     case ENTER:    toggleScreen(); break;
                 }

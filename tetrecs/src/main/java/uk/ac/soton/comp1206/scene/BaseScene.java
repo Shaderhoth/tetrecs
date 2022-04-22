@@ -39,7 +39,8 @@ public abstract class BaseScene {
      */
     public Scene setScene() {
         var previous = gameWindow.getScene();
-        Scene scene = new Scene(root, previous.getWidth(), previous.getHeight(), Color.BLACK);
+        Scene scene = new Scene(root, previous.getWidth(), previous.getHeight(), false, gameWindow.getAntiAlias());
+        scene.setFill(Color.BLACK);
         scene.getStylesheets().add(getClass().getResource("/style/game.css").toExternalForm());
         this.scene = scene;
         return scene;

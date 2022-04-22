@@ -1,9 +1,12 @@
 package uk.ac.soton.comp1206.scene;
 
+import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.EventHandler;
 import javafx.geometry.Pos;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
@@ -31,6 +34,10 @@ public class MenuScene extends BaseScene {
      */
     private Multimedia media;
     /**
+     * The Bottom pane on top of which everything else is placed
+     */
+    private StackPane menuPane;
+    /**
      * Create a new menu scene
      * @param gameWindow the Game Window this will be displayed in
      */
@@ -48,21 +55,40 @@ public class MenuScene extends BaseScene {
 
         root = new GamePane(gameWindow.getWidth(),gameWindow.getHeight());
         Multimedia.playMedia("menu.mp3");
-        var menuPane = new StackPane();
+        menuPane = new StackPane();
         menuPane.setMaxWidth(gameWindow.getWidth());
         menuPane.setMaxHeight(gameWindow.getHeight());
         menuPane.getStyleClass().add("scene-background");
-        menuPane.setBackground(gameWindow.getBackground());
         root.getChildren().add(menuPane);
 
         var mainPane = new BorderPane();
-        mainPane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            menuPane.getChildren().add(Multimedia.getVideo());
+        }else {
+            mainPane.setBackground(gameWindow.getBackground());
+        }
         menuPane.getChildren().add(mainPane);
 
-        //Awful title
-        var title = new Text("TetrECS");
-        title.getStyleClass().add("title");
-        mainPane.setTop(title);
+
+        HBox imageBox = new HBox();
+        var image = new Image(this.getClass().getResource("/images/TetrECS.png").toExternalForm());
+        var imageView = new ImageView(image);
+        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(256);
+
+        imageBox.getChildren().add(imageView);
+        imageBox.setAlignment(Pos.BOTTOM_LEFT);
+        imageBox.setMinHeight((imageView.getFitWidth() + imageView.getFitHeight())*(Math.sin(Math.toRadians(20))));
+        imageBox.setMaxHeight((imageView.getFitWidth() + imageView.getFitHeight())*(Math.sin(Math.toRadians(20))));
+        mainPane.setTop(imageBox);
+        AnimationTimer timer = new AnimationTimer(){
+            @Override
+            public void handle(long now){
+
+                imageView.setRotate(Math.sin((double) now/1000000000) * 20);
+            }
+        };
+        timer.start();
 
         //For now, let us just add a button that starts the game. I'm sure you'll do something way better.
         VBox options = new VBox();
@@ -128,6 +154,8 @@ public class MenuScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    menuPane.getChildren().get(menuPane.getChildren().size()-1).setVisible(! menuPane.getChildren().get(menuPane.getChildren().size()-1).isVisible()); break;
+
                     case ESCAPE:    Platform.exit(); break;
                 }
             }

@@ -174,6 +174,8 @@ public class MultiplayerScene extends ChallengeScene{
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    challengePane.getChildren().get(challengePane.getChildren().size()-1).setVisible(! challengePane.getChildren().get(challengePane.getChildren().size()-1).isVisible()); break;
+
                     case ESCAPE:
                         exit(); break;
                     case W:

@@ -8,6 +8,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.web.WebView;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import uk.ac.soton.comp1206.component.GameBlock;
@@ -81,6 +82,7 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
     @Override
     public void build() {
 
+
         logger.info("Building " + this.getClass().getName());
 
         setupGame();
@@ -94,7 +96,11 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
         root.getChildren().add(challengePane);
 
         mainPane = new BorderPane();
-        mainPane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            challengePane.getChildren().add(Multimedia.getVideo());
+        }else {
+            mainPane.setBackground(gameWindow.getBackground());
+        }
         challengePane.getChildren().add(mainPane);
 
         board = makeBoard();
@@ -274,6 +280,7 @@ public class ChallengeScene extends BaseScene implements PieceSpawnedListener {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    challengePane.getChildren().get(challengePane.getChildren().size()-1).setVisible(! challengePane.getChildren().get(challengePane.getChildren().size()-1).isVisible()); break;
                     case ESCAPE:    exit(); break;
                     case W:
                     case UP:

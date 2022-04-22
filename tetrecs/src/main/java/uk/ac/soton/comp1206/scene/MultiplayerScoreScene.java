@@ -94,4 +94,5 @@ public class MultiplayerScoreScene extends ScoreScene{
         logger.info("multiplayer scores loaded");
         return scores;
     }
+
 }

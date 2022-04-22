@@ -58,7 +58,7 @@ public class LobbyScene extends BaseScene {
      */
     private VBox channelPane;
     /**
-     * The main pane
+     * The Bottom pane on top of which everything else is placed
      */
     private StackPane lobbyPane;
     /**
@@ -183,12 +183,16 @@ public class LobbyScene extends BaseScene {
         lobbyPane.setMaxWidth(gameWindow.getWidth());
         lobbyPane.setMaxHeight(gameWindow.getHeight());
         lobbyPane.getStyleClass().add("scene-background");
-        lobbyPane.setBackground(gameWindow.getBackground());
+
         root.getChildren().add(lobbyPane);
 
 
         BorderPane mainPane = new BorderPane();
-        mainPane.setBackground(gameWindow.getBackground());
+        if (Multimedia.getVideo() != null){
+            lobbyPane.getChildren().add(Multimedia.getVideo());
+        }else {
+            mainPane.setBackground(gameWindow.getBackground());
+        }
         mainPane.setMaxWidth(gameWindow.getWidth());
         mainPane.setMinWidth(gameWindow.getWidth());
         lobbyPane.getChildren().add(mainPane);
@@ -254,6 +258,8 @@ public class LobbyScene extends BaseScene {
             @Override
             public void handle(KeyEvent event) {
                 switch (event.getCode()) {
+                    case ALT:    lobbyPane.getChildren().get(lobbyPane.getChildren().size()-1).setVisible(! lobbyPane.getChildren().get(lobbyPane.getChildren().size()-1).isVisible()); break;
+
                     case ESCAPE:    exit(); break;
                 }
             }
